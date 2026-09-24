@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* Design tokens from the Consulting Coach front-end spec (section 3). */
+:root {
+  --bg: #f7f7f5;
+  --surface: #ffffff;
+  --ink: #111827;
+  --ink-muted: #6b7280;
+  --border: #e5e7eb;
+  --primary: #0b3d5c;
+  --accent: #c8963e;
+  --success: #1f7a4d;
+  --warning: #b7791f;
+  --danger: #b42318;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --surface: #171a21;
+    --ink: #f3f4f6;
+    --ink-muted: #9ca3af;
+    --border: #262b36;
+    --primary: #5ba4d6;
+    --accent: #e0b566;
+    --success: #4cc38a;
+    --warning: #f2b84b;
+    --danger: #f97066;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+}

@@ -17,7 +17,11 @@ export class SpotifyError extends Error {
 
 export class Spotify {
   constructor() {
-    this.state = JSON.parse(localStorage.getItem(STORE) || '{}');
+    try {
+      this.state = JSON.parse(localStorage.getItem(STORE) || '{}');
+    } catch {
+      this.state = {}; // storage blocked (private window, sandboxed frame)
+    }
     this.analysisBlocked = false;
     this.analysisCache = new Map();
   }
@@ -41,7 +45,11 @@ export class Spotify {
   }
 
   #save() {
-    localStorage.setItem(STORE, JSON.stringify(this.state));
+    try {
+      localStorage.setItem(STORE, JSON.stringify(this.state));
+    } catch {
+      /* storage blocked: stay logged in for this page load only */
+    }
   }
 
   async login(clientId) {

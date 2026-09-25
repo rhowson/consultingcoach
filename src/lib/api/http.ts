@@ -12,6 +12,13 @@ export class HttpError extends Error {
   }
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Ids come from URLs; a malformed one is simply "not found", not a database error. */
+export function isUuid(id: string) {
+  return UUID.test(id);
+}
+
 export const notFound = (what = "Resource") => new HttpError(404, `${what} not found`, "not_found");
 export const badRequest = (message: string) => new HttpError(400, message, "bad_request");
 

@@ -3,7 +3,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { LEVELS, verdictFor, type Level } from "@/lib/competency";
 import type { User } from "@/lib/auth";
-import { HttpError, badRequest, notFound } from "@/lib/api/http";
+import { HttpError, badRequest, isUuid, notFound } from "@/lib/api/http";
 import * as engine from "@/lib/ai/engine";
 import type { PersonaContext, ScenarioContext } from "@/lib/ai/prompts";
 import type { CriterionScore, Mood, TranscriptTurn } from "@/lib/types";
@@ -29,6 +29,7 @@ async function loadSimulation(scenario: Scenario) {
 }
 
 export async function loadOwnedAttempt(user: User, attemptId: string) {
+  if (!isUuid(attemptId)) throw notFound("Attempt");
   const attempt = await db.query.attempts.findFirst({
     where: and(eq(schema.attempts.id, attemptId), eq(schema.attempts.userId, user.id)),
   });

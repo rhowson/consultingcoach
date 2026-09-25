@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { db, schema } from "@/db";
 import type { User } from "@/lib/auth";
-import { HttpError, badRequest, notFound } from "@/lib/api/http";
+import { HttpError, badRequest, isUuid, notFound } from "@/lib/api/http";
 import * as engine from "@/lib/ai/engine";
 import type { GhostSlide, PyramidNode, StudioComment } from "@/lib/types";
 import { finalizeAttempt } from "./attempts";
@@ -18,6 +18,7 @@ async function loadCase(scenarioId: string) {
 }
 
 async function loadOwned(user: User, id: string) {
+  if (!isUuid(id)) throw notFound("Storyboard");
   const sb = await db.query.storyboards.findFirst({
     where: and(eq(schema.storyboards.id, id), eq(schema.storyboards.userId, user.id)),
   });

@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { and, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import type { User } from "@/lib/auth";
-import { notFound } from "@/lib/api/http";
+import { isUuid, notFound } from "@/lib/api/http";
 import * as engine from "@/lib/ai/engine";
 import type { Level } from "@/lib/competency";
 
@@ -35,6 +35,7 @@ export async function listReviews(user: User) {
 }
 
 export async function getReview(user: User, id: string) {
+  if (!isUuid(id)) throw notFound("Review");
   const row = await db.query.redPenReviews.findFirst({
     where: and(eq(schema.redPenReviews.id, id), eq(schema.redPenReviews.userId, user.id)),
   });

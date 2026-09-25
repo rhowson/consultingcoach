@@ -1,7 +1,7 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { COMPETENCIES, biggestGap, type Competency, type Level } from "@/lib/competency";
+import { COMPETENCIES, COMPETENCY_LABELS, biggestGap, type Competency, type Level } from "@/lib/competency";
 import type { User } from "@/lib/auth";
 import { titleQuiz } from "@/content/diagnostic";
 import type { PlanWeek } from "@/lib/types";
@@ -121,4 +121,4 @@ export async function generatePlan(user: User, scores: Scores) {
   return plan;
 }
 
-const label = (c: Competency) => c.replace("_", " ");
+const label = (c: Competency) => COMPETENCY_LABELS[c];

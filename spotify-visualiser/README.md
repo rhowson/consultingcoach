@@ -2,6 +2,36 @@
 
 A three.js music visualiser that connects to your Spotify account. It needs no build step and no backend: it's static HTML plus ES modules.
 
+## Your Galaxy (main scene)
+
+| Launch | Warp | Pulsar + song card |
+| --- | --- | --- |
+| ![](docs/galaxy-launch.png) | ![](docs/galaxy-warp.png) | ![](docs/galaxy-pulsar.png) |
+
+Your listening history as a galaxy you can fly around:
+
+- **Every song is a star.** Its **position is its genre**: twelve constellations along the spiral arms (Electronic, Indie, Hip hop…), with micro-genres ("uk garage", "neo soul") as sub-clusters inside them. Its **size is your play count**. Songs whose genre isn't known yet sit in the Uncharted rim, then glide home once Spotify tells us the artist's genres.
+- **Explore:** drag to orbit, scroll to zoom (micro-genre labels appear as you get close), hover for a tooltip, click for the song card (art, genres, plays, last played, top-track rank, Open in Spotify), and double-click to fly there. Switch between 4 weeks, 6 months, 12 months and all time.
+- **When a song starts** its card is shown, then the camera accelerates through warp to that song's star.
+- **On arrival the star becomes a pulsar.** Its beams spin with the tempo (half a turn per beat). Every *sudden jump* in loudness (short-term energy vs. the recent trend) fires a ring whose size, speed and brightness scale with the jump. Kicks make small ripples; a drop sends a shockwave across the galaxy that lights up every star it passes.
+
+### Where the play counts come from
+
+Spotify's API has **no play counts**, so the app keeps its own history in the browser (IndexedDB):
+
+| Source | What it gives |
+| --- | --- |
+| Live | A play is counted while the page is open, once 30 s (or half a short track) has been heard |
+| Recently played | Spotify's last 50 plays, synced at launch and every 10 min to fill gaps |
+| Top tracks | Your top 50 for 4 weeks, 6 months and ~1 year. They seed the galaxy on day one (sized by rank until real plays are counted) |
+| Streaming-history import | Request **Extended streaming history** at [spotify.com/account/privacy](https://www.spotify.com/account/privacy/) (it takes a few days), then import the JSON files under Sources. This gives years of plays at once |
+
+The same listen is never counted twice across sources. History stays in that browser. For tracking while the page is closed, the next step would be a small server that polls recently-played every hour.
+
+Note that Spotify's February 2026 development-mode changes removed the batch endpoints, so artists are looked up one at a time (cached, most-played first, respecting rate limits). Development-mode apps also need the owner to have Premium and allow up to 5 users.
+
+## Other scenes
+
 | Spectral Terrain | Album Cosmos | Harmonic Orbit |
 | --- | --- | --- |
 | ![](docs/terrain.png) | ![](docs/album.png) | ![](docs/harmonic.png) |
@@ -14,14 +44,14 @@ python3 -m http.server 8888 --bind 127.0.0.1
 # open http://127.0.0.1:8888/
 ```
 
-Click **Just show me the demo** to see it straight away with a synthetic song.
+Click **Just show me the demo** to see it straight away with a synthetic song and a made-up 700-song library.
 
 ### Connect Spotify
 
 1. Create an app at <https://developer.spotify.com/dashboard> and choose "Web API".
 2. Add the redirect URI `http://127.0.0.1:8888/`. Spotify no longer accepts `localhost`; use the loopback IP or HTTPS.
 3. While the app is in development mode, add your Spotify account under **User Management**.
-4. Paste the Client ID into the Sources panel and click **Connect**. Login uses PKCE, so no client secret is needed.
+4. Paste the Client ID into the Sources panel and click **Connect**. Login uses PKCE, so no client secret is needed. If you connected before the Galaxy existed, disconnect and reconnect once so the app can read your top tracks and recent plays.
 
 ### Add live audio (recommended)
 
@@ -74,7 +104,7 @@ Most visualisers are a 2D bar graph or a pulsing circle, reacting only to loudne
 
 ## Controls
 
-`1`–`3` scenes · `←`/`→` or `Space` cycle · `A` auto-switch on sections · `H` hide HUD · `F` fullscreen
+`1`–`4` scenes · `←`/`→` or `Space` cycle · `A` auto-switch on sections (the Galaxy stays put) · `H` hide HUD · `F` fullscreen · `Esc` close song card
 
 ## Files
 
@@ -82,7 +112,9 @@ Most visualisers are a 2D bar graph or a pulsing circle, reacting only to loudne
 index.html, style.css     UI shell; three.js is loaded from jsDelivr through an import map
 src/main.js               renderer, bloom, source selection, Spotify polling, HUD
 src/spotify.js            PKCE auth and Web API client
+src/history.js            IndexedDB play history: live, recently-played, top tracks, import
+src/genres.js             micro-genre → constellation rules and deterministic star layout
 src/audio.js              LiveSource (FFT, onsets, chroma), AnalysisSource, DemoSource
 src/palette.js            album-art palette and pixel extraction
-src/scenes/*.js           the three scenes
+src/scenes/*.js           galaxy, terrain, album, harmonic
 ```

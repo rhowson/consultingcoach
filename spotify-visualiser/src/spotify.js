@@ -4,13 +4,14 @@
 const AUTH_URL = 'https://accounts.spotify.com/authorize';
 const TOKEN_URL = 'https://accounts.spotify.com/api/token';
 const API = 'https://api.spotify.com/v1';
-const SCOPES = 'user-read-currently-playing user-read-playback-state';
+const SCOPES = 'user-read-currently-playing user-read-playback-state user-read-recently-played user-top-read';
 const STORE = 'sv.spotify';
 
 export class SpotifyError extends Error {
-  constructor(status, message) {
+  constructor(status, message, retryAfter = 0) {
     super(message);
     this.status = status;
+    this.retryAfter = retryAfter;
   }
 }
 
@@ -31,6 +32,12 @@ export class Spotify {
 
   get loggedIn() {
     return !!this.state.refreshToken;
+  }
+
+  // Logins from before the history feature lack the history scopes.
+  get hasHistoryScopes() {
+    const granted = this.state.scope || '';
+    return granted.includes('user-read-recently-played') && granted.includes('user-top-read');
   }
 
   #save() {
@@ -90,6 +97,7 @@ export class Spotify {
       accessToken: json.access_token,
       refreshToken: json.refresh_token || this.state.refreshToken,
       expiresAt: Date.now() + (json.expires_in - 60) * 1000,
+      scope: json.scope || this.state.scope || '',
     };
     this.#save();
   }
@@ -110,7 +118,7 @@ export class Spotify {
     }
     if (res.status === 429) {
       const wait = Number(res.headers.get('Retry-After') || 5);
-      throw new SpotifyError(429, `Rate limited — retrying in ${wait}s`);
+      throw new SpotifyError(429, `Rate limited — retrying in ${wait}s`, wait);
     }
     if (!res.ok) {
       const json = await res.json().catch(() => ({}));
@@ -121,6 +129,31 @@ export class Spotify {
 
   currentlyPlaying() {
     return this.api('/me/player/currently-playing');
+  }
+
+  recentlyPlayed() {
+    return this.api('/me/player/recently-played?limit=50');
+  }
+
+  // term: short_term (~4 weeks) | medium_term (~6 months) | long_term (~1 year)
+  topTracks(term) {
+    return this.api(`/me/top/tracks?limit=50&time_range=${term}`);
+  }
+
+  track(id) {
+    return this.api(`/tracks/${id}`);
+  }
+
+  // Batch endpoints (GET /artists?ids=) were removed from development-mode
+  // apps in Feb 2026, so artists are fetched one at a time and cached.
+  artist(id) {
+    return this.api(`/artists/${id}`);
+  }
+
+  async searchArtist(name) {
+    const res = await this.api(`/search?type=artist&limit=5&q=${encodeURIComponent(name)}`);
+    const items = res?.artists?.items || [];
+    return items.find((a) => a.name.toLowerCase() === name.toLowerCase()) || items[0] || null;
   }
 
   // Spotify restricted audio-analysis for apps created after Nov 2024, so a

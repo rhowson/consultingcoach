@@ -10,6 +10,8 @@ import { analyseArtwork, loadImage, proceduralArtwork } from './palette.js';
 import { TerrainScene } from './scenes/terrain.js';
 import { AlbumScene } from './scenes/album.js';
 import { HarmonicScene } from './scenes/harmonic.js';
+import { GalaxyScene } from './scenes/galaxy.js';
+import { History, demoLibrary } from './history.js';
 
 const $ = (id) => document.getElementById(id);
 const AUTO_CYCLE_MIN_SECONDS = 20;
@@ -21,8 +23,10 @@ const pixelRatio = Math.min(devicePixelRatio, 2);
 renderer.setPixelRatio(pixelRatio);
 $('stage').appendChild(renderer.domElement);
 
-const scenes = [new TerrainScene(), new AlbumScene(), new HarmonicScene()];
-scenes[1].setPixelRatio(pixelRatio);
+const galaxy = new GalaxyScene(renderer.domElement, $('galaxy-ui'), { onRange: setRange, onDetails: trackDetails });
+const album = new AlbumScene();
+album.setPixelRatio(pixelRatio);
+const scenes = [galaxy, new TerrainScene(), album, new HarmonicScene()];
 
 const composer = new EffectComposer(renderer);
 const renderPass = new RenderPass(scenes[0].scene, scenes[0].camera);
@@ -47,6 +51,8 @@ resize();
 // --- State -----------------------------------------------------------------
 
 const spotify = new Spotify();
+const history = new History();
+let historyReady = false;
 const live = new LiveSource();
 const demo = new DemoSource();
 const frame = createFrame();
@@ -56,6 +62,8 @@ const state = {
   autoCycle: true,
   analysis: null, // AnalysisSource for the current Spotify track
   playback: null, // { id, progress, at, playing }
+  listen: null, // the current listen, for counting plays
+  range: '12m',
 };
 
 function spotifyPosition() {
@@ -94,6 +102,7 @@ function showScene(i, now = performance.now() / 1000) {
     renderPass.camera = s.camera;
     fade.classList.remove('on');
   }, 220);
+  scenes.forEach((sc, k) => sc.setActive?.(k === state.scene));
   $('scene-name').textContent = s.name;
   $('scene-blurb').textContent = s.blurb;
   const caption = $('caption');
@@ -118,6 +127,74 @@ function setMessage(text) {
   $('message').hidden = !text;
 }
 
+// --- Galaxy & listening history ----------------------------------------------
+
+async function refreshLibrary() {
+  const real = historyReady && (spotify.loggedIn || (await history.stats()).tracks > 0);
+  if (!real) return galaxy.setLibrary(demoLibrary());
+  galaxy.setLibrary(await history.load(state.range, state.playback?.id));
+  const { tracks, plays } = await history.stats();
+  $('history-stats').textContent = `${tracks.toLocaleString()} songs · ${plays.toLocaleString()} plays stored in this browser`;
+}
+
+let refreshTimer;
+function scheduleRefresh() {
+  clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(refreshLibrary, 800);
+}
+
+function setRange(range) {
+  state.range = range;
+  refreshLibrary();
+}
+
+function trackDetails(track) {
+  return spotify.loggedIn && historyReady ? history.enrich(spotify, track) : Promise.resolve(null);
+}
+
+// Count a play once 30 s (or half a short track) has been heard.
+function trackListen(data) {
+  const { id, duration_ms: duration = 60000 } = data.item;
+  const progress = data.progress_ms;
+  let listen = state.listen;
+  if (!listen || listen.id !== id || progress < listen.progress - 10000) {
+    listen = state.listen = { id, start: Date.now() - progress, progress, recorded: false };
+  }
+  listen.progress = progress;
+  if (!listen.recorded && historyReady && progress >= Math.min(30000, duration / 2)) {
+    listen.recorded = true;
+    history.recordPlay(id, listen.start, 'live', duration).then((added) => added && scheduleRefresh());
+  }
+}
+
+async function syncHistory() {
+  if (!spotify.hasHistoryScopes) {
+    setMessage('Reconnect Spotify (Sources → Disconnect, then Connect) so the galaxy can read your top tracks and recent plays.');
+    return;
+  }
+  for (const sync of [() => history.syncTop(spotify), () => history.syncRecent(spotify)]) {
+    try {
+      await sync();
+    } catch (err) {
+      console.warn('History sync failed:', err);
+    }
+  }
+  await refreshLibrary();
+  history.resolvePending(spotify, scheduleRefresh);
+  setInterval(() => history.syncRecent(spotify).then((n) => n && scheduleRefresh(), () => {}), 10 * 60000);
+}
+
+// Without Spotify, tour the demo galaxy: a new "song" launches every 40 s.
+function demoTour() {
+  if (spotify.loggedIn) return;
+  const tracks = galaxy.tracks;
+  if (tracks.length) {
+    let x = Math.random() * tracks.reduce((a, t) => a + t.plays, 0);
+    galaxy.play(tracks.find((t) => (x -= t.plays) <= 0) || tracks[0]);
+  }
+  setTimeout(demoTour, 40000);
+}
+
 // --- Spotify polling -------------------------------------------------------
 
 async function onTrackChange(item) {
@@ -128,6 +205,13 @@ async function onTrackChange(item) {
   const art = images[1] || images[0];
   $('track-art').src = art?.url || '';
   $('track').hidden = false;
+
+  if (item.type === 'track' && historyReady) {
+    history.trackStarted(spotify, item).then(async (track) => {
+      await refreshLibrary();
+      if (state.playback?.id === item.id) galaxy.play(track);
+    });
+  }
 
   if (art) {
     try {
@@ -157,6 +241,7 @@ async function pollSpotify() {
       const changed = state.playback?.id !== data.item.id;
       state.playback = { id: data.item.id, progress: data.progress_ms / 1000, at: performance.now(), playing: data.is_playing };
       if (changed) onTrackChange(data.item);
+      if (data.is_playing && data.item.type === 'track') trackListen(data);
     }
   } catch (err) {
     if (err.status === 429) delay = 10000;
@@ -209,6 +294,24 @@ $('use-demo').onclick = () => {
   live.stop();
   closePanel();
 };
+$('history-files').onchange = async (e) => {
+  const files = [...e.target.files];
+  e.target.value = '';
+  if (!files.length || !historyReady) return;
+  try {
+    const { tracks, plays } = await history.importFiles(files);
+    setMessage(`Imported ${plays.toLocaleString()} plays (${tracks.toLocaleString()} new songs). Placing them in their genres…`);
+    await refreshLibrary();
+    if (spotify.loggedIn) history.resolvePending(spotify, scheduleRefresh);
+  } catch (err) {
+    setMessage(`Import failed: ${err.message}`);
+  }
+};
+$('clear-history').onclick = async () => {
+  if (!historyReady || !confirm('Delete all listening history stored in this browser?')) return;
+  await history.clear();
+  refreshLibrary();
+};
 $('open-panel').onclick = () => ($('panel').hidden = false);
 $('close-panel').onclick = closePanel;
 
@@ -242,7 +345,7 @@ function tick() {
   tl?.apply(frame, pos);
   if (live.active) live.apply(frame, dt, now, !tl);
 
-  if (state.autoCycle && frame.sectionChanged && now - state.lastSwitch > AUTO_CYCLE_MIN_SECONDS) showScene(state.scene + 1, now);
+  if (state.autoCycle && !scenes[state.scene].interactive && frame.sectionChanged && now - state.lastSwitch > AUTO_CYCLE_MIN_SECONDS) showScene(state.scene + 1, now);
 
   const active = scenes[state.scene];
   active.update(frame, dt, t, tl, pos);
@@ -264,8 +367,18 @@ async function init() {
     setMessage(err.message);
   }
   updateSpotifyUi();
-  if (spotify.loggedIn) pollSpotify();
+  try {
+    await history.open();
+    historyReady = true;
+  } catch (err) {
+    console.warn('IndexedDB unavailable, galaxy history disabled:', err);
+  }
+  await refreshLibrary();
   showScene(0);
   requestAnimationFrame(tick);
+  if (spotify.loggedIn) {
+    pollSpotify();
+    if (historyReady) syncHistory();
+  } else setTimeout(demoTour, 1500);
 }
 init();

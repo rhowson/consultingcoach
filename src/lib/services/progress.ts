@@ -155,7 +155,6 @@ export async function getDashboard(user: User) {
   const weekStart = startOfWeek();
   const attemptedIds = new Set(recentAttempts.map((a) => a.scenarioId));
   const completedScenarioIds = new Set(completed.map((a) => a.scenarioId));
-  const target = targetLevelFor(user);
 
   // Today's rep: a scenario that trains the biggest gap, preferring ones not yet tried.
   const candidates = scenarios.filter((s) => s.competencies.includes(gap) && !s.isPro);
@@ -196,7 +195,7 @@ export async function getDashboard(user: User) {
     todaysRep: todaysRep && {
       scenario: publicScenario(todaysRep),
       persona: repPersona ? publicPersona(repPersona) : null,
-      whatGoodLooksLike: todaysRep.briefing.whatGoodLooksLike[target] ?? todaysRep.briefing.whatGoodLooksLike[todaysRep.targetLevel] ?? null,
+      whatGoodLooksLike: todaysRep.briefing.whatGoodLooksLike[todaysRep.targetLevel] ?? null,
       href: scenarioHref(todaysRep),
     },
     week: {

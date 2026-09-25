@@ -65,10 +65,8 @@ for (const [competency, score] of Object.entries(demoScores)) {
   await db
     .insert(schema.competencyScores)
     .values({ userId: demo.id, competency: competency as keyof typeof demoScores, score })
-    .onConflictDoUpdate({
-      target: [schema.competencyScores.userId, schema.competencyScores.competency],
-      set: { score, updatedAt: new Date() },
-    });
+    // Only on first seed — later deploys must not overwrite progress made in the demo.
+    .onConflictDoNothing();
 }
 
 // Demo development plan (only if Priya has none yet), focused on her biggest gap.

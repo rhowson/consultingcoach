@@ -82,7 +82,7 @@ export default async function HomePage() {
           </div>
           {d.todaysRep.whatGoodLooksLike && (
             <div className="flex flex-none flex-col gap-3.5 border-t border-border bg-subtle p-6 md:p-8 lg:w-[340px] lg:border-t-0 lg:border-l">
-              <Eyebrow>What good looks like at {LEVEL_LABELS[d.readiness.targetLevel]}</Eyebrow>
+              <Eyebrow>What good looks like at {LEVEL_LABELS[d.todaysRep.scenario.targetLevel]}</Eyebrow>
               {d.todaysRep.whatGoodLooksLike
                 .split(/(?<=[.;])\s+/)
                 .filter(Boolean)

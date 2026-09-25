@@ -2,7 +2,22 @@
 
 An AI coaching app that trains consultants from Analyst to Director. Users practise client conversations with AI personas, build storylines in a Storyboard Studio, get deliverables marked up by a "Partner Red Pen", and track readiness for the next level.
 
-This repo currently contains the **back-end foundation**: data model, auth, AI coaching engine, and the full JSON API. The front end is being designed in Claude Design from the [front-end spec](https://claude.ai/code/artifact/8ab7cfd6-b1f5-43a4-822e-cacfff7f0c38) and will be built on top of this API.
+The front end is built from the Claude Design project (tokens, Home, Client Simulator, Storyboard Studio, SteerCo Rehearsal) and the [front-end spec](https://claude.ai/code/artifact/8ab7cfd6-b1f5-43a4-822e-cacfff7f0c38), on top of the JSON API in `src/app/api`.
+
+| Screen | Route |
+| --- | --- |
+| Login / signup (with demo sign-in) | `/login`, `/signup` |
+| Onboarding diagnostic | `/onboarding` |
+| Home dashboard | `/` |
+| Learn (tracks, lessons, quizzes) | `/learn`, `/learn/:id` |
+| Practice hub + briefing drawer | `/practice` |
+| Client Simulator | `/practice/sim/:attemptId` |
+| Feedback report | `/feedback/:attemptId` |
+| Storyboard Studio | `/studio`, `/studio/:id` |
+| SteerCo Rehearsal | `/rehearsal/:storyboardId` |
+| Partner Red Pen | `/red-pen`, `/red-pen/:id` |
+| Progress | `/progress` |
+| Settings | `/settings` |
 
 ## Stack
 
@@ -56,7 +71,10 @@ Every Claude request opts into server-side refusal fallbacks (`fallbacks: "defau
 
 ```
 src/
+  app/              Pages: (app) shell screens, (session) full-screen sessions, (auth), onboarding
   app/api/          Route handlers (see docs/API.md)
+  components/       UI: ui/ primitives, shell/, and one folder per screen
+  lib/client/       Typed browser API client + SSE reader
   content/          Seed content: personas, scenarios, rubrics, case packs, lessons
   db/               Drizzle schema, client, migrate + seed scripts
   lib/ai/           Claude client, prompts, engine, mock engine
@@ -74,7 +92,8 @@ drizzle/            SQL migrations
 
 ## Not built yet
 
-- The front end (waiting on Claude Design)
+- SteerCo Rehearsal questions are scripted client-side and not scored yet
+- Pro plan / billing (Pro scenarios always show as locked)
 - File parsing for Red Pen uploads (the API takes plain text for now)
-- SteerCo Rehearsal (multi-persona), voice mode, the B2B team dashboard, billing
+- Voice mode and the B2B team dashboard
 - Rate limiting on AI endpoints

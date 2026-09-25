@@ -71,6 +71,24 @@ for (const [competency, score] of Object.entries(demoScores)) {
     });
 }
 
+// Demo development plan (only if Priya has none yet), focused on her biggest gap.
+const existingPlan = await db.query.developmentPlans.findFirst({
+  where: (p, { and, eq }) => and(eq(p.userId, demo.id), eq(p.active, true)),
+});
+if (!existingPlan) {
+  const item = (kind: "lesson" | "scenario", refId: string, title: string) => ({ kind, refId, title });
+  await db.insert(schema.developmentPlans).values({
+    userId: demo.id,
+    focus: "difficult_conversations",
+    weeks: [
+      { week: 1, theme: "Name the problem", items: [item("lesson", "pushback-acknowledge", "Acknowledge before you argue"), item("scenario", "savings-number-wrong", "Your savings number is wrong")] },
+      { week: 2, theme: "Repair before you defend", items: [item("scenario", "leaked-findings", "The leaked findings"), item("lesson", "scope-options", "Offer options, not refusals"), item("scenario", "while-youre-here", "While you're here…")] },
+      { week: 3, theme: "Tell the story", items: [item("lesson", "pyramid-answer-first", "Answer first"), item("lesson", "pyramid-mece", "MECE key lines"), item("scenario", "brightwave-churn", "Brightwave Telecom: why is churn rising?")] },
+      { week: 4, theme: "Bar check", items: [item("scenario", "leaked-findings", "The leaked findings (retry at the Manager bar)"), item("scenario", "ten-minute-ceo", "The 10-minute CEO")] },
+    ],
+  });
+}
+
 console.log(`Seeded ${personas.length} personas, ${scenarios.length} scenarios, ${lessons.length} lessons.`);
 console.log(`Demo login: ${demoEmail} / coachdemo`);
 await pool.end();

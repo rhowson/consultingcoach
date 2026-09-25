@@ -1,48 +1,146 @@
 @import "tailwindcss";
 
-/* Design tokens from the Consulting Coach front-end spec (section 3). */
+/*
+ * Design tokens — from the Claude Design "Design system" page.
+ * Use these via Tailwind (bg-surface, text-muted, border-border, …); never hard-code hex in components.
+ */
 :root {
   --bg: #f7f7f5;
   --surface: #ffffff;
+  --subtle: #f7f7f5;
+  --hover: #f3f4f6;
   --ink: #111827;
-  --ink-muted: #6b7280;
+  --ink-2: #374151;
+  --muted: #6b7280;
+  --faint: #9ca3af;
   --border: #e5e7eb;
+  --border-strong: #c9cdd3;
+  --divider: #f0f0ee;
   --primary: #0b3d5c;
+  --primary-hover: #082e46;
+  --primary-tint: #eef3f6;
+  --on-primary: #ffffff;
   --accent: #c8963e;
+  --accent-tint: #f6ebd5;
+  --accent-ink: #8a5a12;
   --success: #1f7a4d;
+  --success-tint: #e6f2ec;
   --warning: #b7791f;
+  --warning-tint: #fbf0dc;
+  --warning-ink: #8a5a12;
   --danger: #b42318;
+  --danger-tint: #fceae8;
+  --level-analyst: #64748b;
+  --level-consultant: #0e7490;
+  --level-manager: #0b3d5c;
+  --level-director: #c8963e;
+  --mood-from: #fdecea;
+  --mood-to: #b42318;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0f1115;
     --surface: #171a21;
+    --subtle: #1c2029;
+    --hover: #222733;
     --ink: #f3f4f6;
-    --ink-muted: #9ca3af;
+    --ink-2: #d1d5db;
+    --muted: #9ca3af;
+    --faint: #6b7280;
     --border: #262b36;
+    --border-strong: #3a4150;
+    --divider: #1f242d;
     --primary: #5ba4d6;
+    --primary-hover: #7fb8e0;
+    --primary-tint: #16283a;
+    --on-primary: #0f1115;
     --accent: #e0b566;
+    --accent-tint: #3a2f1a;
+    --accent-ink: #e0b566;
     --success: #4cc38a;
+    --success-tint: #173327;
     --warning: #f2b84b;
+    --warning-tint: #3a2e14;
+    --warning-ink: #f2b84b;
     --danger: #f97066;
+    --danger-tint: #3a1d1d;
+    --level-manager: #5ba4d6;
+    --level-director: #e0b566;
+    --mood-from: #3a1d1d;
+    --mood-to: #f97066;
   }
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-subtle: var(--subtle);
+  --color-hover: var(--hover);
   --color-ink: var(--ink);
-  --color-ink-muted: var(--ink-muted);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-divider: var(--divider);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-tint: var(--primary-tint);
+  --color-on-primary: var(--on-primary);
   --color-accent: var(--accent);
+  --color-accent-tint: var(--accent-tint);
+  --color-accent-ink: var(--accent-ink);
   --color-success: var(--success);
+  --color-success-tint: var(--success-tint);
   --color-warning: var(--warning);
+  --color-warning-tint: var(--warning-tint);
+  --color-warning-ink: var(--warning-ink);
   --color-danger: var(--danger);
+  --color-danger-tint: var(--danger-tint);
+  --color-level-analyst: var(--level-analyst);
+  --color-level-consultant: var(--level-consultant);
+  --color-level-manager: var(--level-manager);
+  --color-level-director: var(--level-director);
+  --font-sans: var(--font-inter), Inter, system-ui, sans-serif;
+  --font-serif: var(--font-serif4), "Source Serif 4", Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
+  margin: 0;
   background: var(--bg);
   color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Small uppercase label used across cards ("TODAY'S REP", "BRIEFING"). */
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
 }

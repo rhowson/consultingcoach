@@ -109,21 +109,44 @@ export function streakDays(completedDates: Date[], today = new Date()): number {
   return streak;
 }
 
+/** Where the front end routes each scenario kind. */
+export function scenarioHref(s: { id: string; kind: string }) {
+  return s.kind === "storyboard" ? `/studio/new?case=${s.id}` : `/practice?start=${s.id}`;
+}
+
+/** Lightweight numbers for the app shell's top bar. */
+export async function getShellData(user: User) {
+  const scores = await getScores(user.id);
+  const completed = await db
+    .select({ completedAt: schema.attempts.completedAt })
+    .from(schema.attempts)
+    .where(and(eq(schema.attempts.userId, user.id), eq(schema.attempts.status, "completed")));
+  return {
+    name: user.name,
+    currentLevel: user.currentLevel,
+    targetLevel: targetLevelFor(user),
+    readiness: readinessPercent(scores),
+    streakDays: streakDays(completed.map((a) => a.completedAt!).filter(Boolean)),
+  };
+}
+
 export async function getDashboard(user: User) {
   const scores = await getScores(user.id);
   const gap = biggestGap(scores);
   const since = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
 
-  const [recentAttempts, scenarios, plan, lessons, done] = await Promise.all([
+  const [recentAttempts, scenarios, personas, plan, tracks, lessons, done] = await Promise.all([
     db.query.attempts.findMany({
       where: and(eq(schema.attempts.userId, user.id), gte(schema.attempts.startedAt, since)),
       orderBy: desc(schema.attempts.startedAt),
     }),
     db.query.scenarios.findMany(),
+    db.query.personas.findMany(),
     db.query.developmentPlans.findFirst({
       where: and(eq(schema.developmentPlans.userId, user.id), eq(schema.developmentPlans.active, true)),
       orderBy: desc(schema.developmentPlans.createdAt),
     }),
+    db.query.tracks.findMany({ orderBy: schema.tracks.order }),
     db.query.lessons.findMany({ orderBy: [schema.lessons.trackId, schema.lessons.order] }),
     db.select({ lessonId: schema.lessonProgress.lessonId }).from(schema.lessonProgress).where(eq(schema.lessonProgress.userId, user.id)),
   ]);
@@ -131,34 +154,81 @@ export async function getDashboard(user: User) {
   const completed = recentAttempts.filter((a) => a.status === "completed" && a.completedAt);
   const weekStart = startOfWeek();
   const attemptedIds = new Set(recentAttempts.map((a) => a.scenarioId));
+  const completedScenarioIds = new Set(completed.map((a) => a.scenarioId));
+  const target = targetLevelFor(user);
 
   // Today's rep: a scenario that trains the biggest gap, preferring ones not yet tried.
-  const candidates = scenarios.filter((s) => s.competencies.includes(gap));
+  const candidates = scenarios.filter((s) => s.competencies.includes(gap) && !s.isPro);
   const todaysRep = candidates.find((s) => !attemptedIds.has(s.id)) ?? candidates[0] ?? scenarios[0] ?? null;
+  const repPersona = todaysRep?.personaId ? personas.find((p) => p.id === todaysRep.personaId) : undefined;
 
   const doneIds = new Set(done.map((d) => d.lessonId));
   const byId = new Map(scenarios.map((s) => [s.id, s]));
+  const trackById = new Map(tracks.map((t) => [t.id, t]));
+
+  // Mon–Sun of the current week: did the user complete a rep that day?
+  const todayIdx = (new Date().getUTCDay() + 6) % 7;
+  const repDays = new Set(completed.filter((a) => a.completedAt! >= weekStart).map((a) => (a.completedAt!.getUTCDay() + 6) % 7));
+  const days = ["M", "T", "W", "T", "F", "S", "S"].map((label, i) => ({
+    label,
+    state: repDays.has(i) ? "done" : i === todayIdx ? "today" : i < todayIdx ? "missed" : "upcoming",
+  }));
+
+  const planWeeks = plan?.weeks.map((w) => ({
+    ...w,
+    items: w.items.map((it) => {
+      const s = it.kind === "scenario" ? byId.get(it.refId) : undefined;
+      return {
+        ...it,
+        done: it.kind === "lesson" ? doneIds.has(it.refId) : completedScenarioIds.has(it.refId),
+        href: it.kind === "lesson" ? `/learn/${it.refId}` : s ? scenarioHref(s) : "/practice",
+        mode: s?.kind ?? "lesson",
+        durationMin: s?.durationMin ?? lessons.find((l) => l.id === it.refId)?.durationMin ?? null,
+      };
+    }),
+  }));
+  const currentWeek = planWeeks?.find((w) => w.items.some((i) => !i.done))?.week ?? null;
 
   return {
     readiness: readinessSummary(user, scores),
+    targetDate: user.targetDate,
+    gap: { competency: gap, score: scores[gap] ?? null },
     todaysRep: todaysRep && {
       scenario: publicScenario(todaysRep),
-      reason: `Targets your biggest gap: ${gap.replace("_", " ")}`,
+      persona: repPersona ? publicPersona(repPersona) : null,
+      whatGoodLooksLike: todaysRep.briefing.whatGoodLooksLike[target] ?? todaysRep.briefing.whatGoodLooksLike[todaysRep.targetLevel] ?? null,
+      href: scenarioHref(todaysRep),
     },
     week: {
       goal: user.weeklyRepGoal,
       done: completed.filter((a) => a.completedAt! >= weekStart).length,
       streakDays: streakDays(completed.map((a) => a.completedAt!)),
+      days,
     },
-    plan: plan ?? null,
+    plan: plan ? { id: plan.id, focus: plan.focus, weeks: planWeeks!, currentWeek } : null,
     recentFeedback: completed.slice(0, 3).map((a) => ({
       attemptId: a.id,
       scenarioTitle: byId.get(a.scenarioId)?.title ?? a.scenarioId,
+      mode: a.mode,
       overallScore: a.overallScore,
       verdict: a.verdict,
       completedAt: a.completedAt,
     })),
-    continueLearning: lessons.filter((l) => !doneIds.has(l.id)).slice(0, 6).map(publicLessonSummary),
+    continueLearning: lessons
+      .filter((l) => !doneIds.has(l.id))
+      .slice(0, 6)
+      .map((l) => {
+        const inTrack = lessons.filter((x) => x.trackId === l.trackId);
+        const track = trackById.get(l.trackId);
+        return {
+          ...publicLessonSummary(l),
+          trackTitle: track?.title ?? l.trackId,
+          competency: track?.competency ?? null,
+          position: inTrack.findIndex((x) => x.id === l.id) + 1,
+          trackLength: inTrack.length,
+          trackProgress: inTrack.filter((x) => doneIds.has(x.id)).length / inTrack.length,
+        };
+      }),
   };
 }
 

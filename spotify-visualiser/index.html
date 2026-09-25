@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spotify 3D Visualiser</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <div id="fade"></div>
+
+    <div class="hud">
+      <div id="track" hidden>
+        <img id="track-art" alt="" />
+        <div>
+          <div id="track-title"></div>
+          <div id="track-artist"></div>
+        </div>
+      </div>
+
+      <div id="caption">
+        <div id="scene-name"></div>
+        <div id="scene-blurb"></div>
+      </div>
+
+      <div class="controls">
+        <button data-scene="0" title="Key 1">Terrain</button>
+        <button data-scene="1" title="Key 2">Album</button>
+        <button data-scene="2" title="Key 3">Harmony</button>
+        <button id="auto" class="active" title="Switch scenes on song sections (A)">Auto</button>
+        <button id="open-panel">Sources</button>
+      </div>
+
+      <div class="status"><span id="beat"></span><span id="source"></span></div>
+      <p id="message" hidden></p>
+    </div>
+
+    <div id="panel">
+      <div class="card">
+        <button id="close-panel" class="close" aria-label="Close">×</button>
+        <h1>Spotify 3D Visualiser</h1>
+
+        <section>
+          <h2>1 · Spotify <small>track, artwork &amp; timing</small></h2>
+          <div id="spotify-setup">
+            <p>
+              Create an app at <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com</a>, add this
+              redirect URI, then paste the Client ID:
+            </p>
+            <code id="redirect-uri"></code>
+            <input id="client-id" placeholder="Spotify Client ID" autocomplete="off" spellcheck="false" />
+          </div>
+          <button id="connect" class="primary">Connect Spotify</button>
+        </section>
+
+        <section>
+          <h2>2 · Live audio <small>what makes it react</small></h2>
+          <p>Spotify doesn't let web pages read its audio, so listen to the sound directly:</p>
+          <div class="row">
+            <button id="use-capture">Capture tab / system audio</button>
+            <button id="use-mic">Microphone</button>
+            <label class="button">Local file<input id="file" type="file" accept="audio/*" hidden /></label>
+          </div>
+          <p class="hint">Tip: play Spotify in another Chrome tab (open.spotify.com), click “Capture”, pick that tab and tick “Share tab audio”.</p>
+        </section>
+
+        <button id="use-demo" class="ghost">Just show me the demo →</button>
+        <p class="keys">Keys: <b>1–3</b> scenes · <b>←/→</b> cycle · <b>A</b> auto · <b>H</b> hide HUD · <b>F</b> fullscreen</p>
+      </div>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

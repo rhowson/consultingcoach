@@ -1,0 +1,262 @@
+:root {
+  --accent: #ff2e88;
+  --fg: #f4f1ff;
+  --muted: #a39fb8;
+  --glass: rgba(14, 10, 26, 0.72);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--fg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #05030b;
+}
+
+#stage canvas {
+  display: block;
+}
+
+#fade {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s;
+}
+#fade.on {
+  opacity: 1;
+}
+
+.hud > * {
+  position: fixed;
+  transition: opacity 0.4s;
+}
+.hide-hud .hud > * {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#track {
+  top: 20px;
+  left: 20px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  max-width: calc(100vw - 40px);
+}
+#track[hidden] {
+  display: none;
+}
+#track-art {
+  width: 64px;
+  height: 64px;
+  border-radius: 6px;
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+#track-title {
+  font-weight: 700;
+  font-size: 18px;
+}
+#track-artist {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+#caption {
+  left: 20px;
+  bottom: 56px;
+  max-width: min(460px, calc(100vw - 40px));
+  opacity: 0;
+}
+#caption.show {
+  animation: caption 6s ease forwards;
+}
+@keyframes caption {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  10%,
+  75% {
+    opacity: 1;
+    transform: none;
+  }
+}
+#scene-name {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+#scene-blurb {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.controls {
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+button,
+.button {
+  font: inherit;
+  font-size: 14px;
+  color: var(--fg);
+  background: var(--glass);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+button:hover,
+.button:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+button.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+button.primary {
+  background: #1ed760;
+  color: #06140b;
+  border: 0;
+  font-weight: 700;
+}
+button.ghost {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  padding-left: 0;
+}
+
+.status {
+  left: 20px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+#beat {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+#message {
+  bottom: 20px;
+  right: 20px;
+  margin: 0;
+  max-width: min(420px, calc(100vw - 40px));
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--glass);
+  border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  font-size: 13px;
+  line-height: 1.4;
+}
+#message[hidden] {
+  display: none;
+}
+
+#panel {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(3, 2, 8, 0.55);
+  backdrop-filter: blur(6px);
+  overflow-y: auto;
+}
+#panel[hidden] {
+  display: none;
+}
+.card {
+  position: relative;
+  width: min(560px, 100%);
+  padding: 28px;
+  border-radius: 18px;
+  background: var(--glass);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.card h1 {
+  margin: 0 0 18px;
+  font-size: 24px;
+}
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+.card h2 small {
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: 6px;
+}
+.card section {
+  margin-bottom: 22px;
+}
+.card p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+  margin: 0 0 10px;
+}
+.card a {
+  color: var(--fg);
+}
+.card code {
+  display: block;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.card input {
+  width: 100%;
+  font: inherit;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 9px 12px;
+  margin-bottom: 10px;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.hint,
+.keys {
+  font-size: 12px !important;
+}
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  font-size: 20px;
+}

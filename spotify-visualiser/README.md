@@ -57,6 +57,12 @@ Most visualisers are a 2D bar graph or a pulsing circle, reacting only to loudne
 4. **Song structure drives the camera and the scene.** Scenes switch automatically on section changes (verse → chorus). The camera breathes on bars and pushes in on beats, and the terrain fly-over rolls gently. It feels directed rather than twitchy.
 5. **The whole world takes its colour from the artwork.** Each track's palette is extracted from its cover and pushed toward neon for bloom, so every album gets its own lighting.
 
+### Concept renders (not built yet)
+
+| Sound Sculpture | Drop: the build | Drop: the release | Listening-History Galaxy |
+| --- | --- | --- | --- |
+| ![](docs/concepts/sculpture.png) | ![](docs/concepts/build.png) | ![](docs/concepts/drop.png) | ![](docs/concepts/galaxy.png) |
+
 ### More ideas to build next
 
 - **Walk-through playlist**: each track is a room or planet in a 3D gallery, laid out by the playlist's harmonic key and tempo.

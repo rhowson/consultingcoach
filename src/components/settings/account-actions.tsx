@@ -21,7 +21,7 @@ export function AccountActions() {
     } catch {
       // The session cookie is cleared server-side; if the call failed we still leave.
     }
-    router.replace("/login");
+    router.replace("/welcome");
     router.refresh();
   }
 

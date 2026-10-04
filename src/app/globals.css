@@ -5,70 +5,88 @@
  * Use these via Tailwind (bg-surface, text-muted, border-border, …); never hard-code hex in components.
  */
 :root {
-  --bg: #f7f7f5;
+  /* Sky palette: airy blue-grey canvas, white glass cards, confident sky-blue primary. */
+  --bg: #f2f6fa;
   --surface: #ffffff;
-  --subtle: #f7f7f5;
-  --hover: #f3f4f6;
-  --ink: #111827;
-  --ink-2: #374151;
-  --muted: #6b7280;
-  --faint: #9ca3af;
-  --border: #e5e7eb;
-  --border-strong: #c9cdd3;
-  --divider: #f0f0ee;
-  --primary: #0b3d5c;
-  --primary-hover: #082e46;
-  --primary-tint: #eef3f6;
+  --subtle: #f5f8fb;
+  --hover: #eef3f8;
+  --ink: #0f1b2a;
+  --ink-2: #344256;
+  --muted: #64748b;
+  --faint: #94a3b8;
+  --border: #e3e9f0;
+  --border-strong: #c7d2de;
+  --divider: #edf1f5;
+  --primary: #1f6fae;
+  --primary-hover: #185b90;
+  --primary-tint: #e8f2fa;
+  --primary-2: #3f9ad6;
   --on-primary: #ffffff;
-  --accent: #c8963e;
-  --accent-tint: #f6ebd5;
-  --accent-ink: #8a5a12;
-  --success: #1f7a4d;
-  --success-tint: #e6f2ec;
+  --accent: #e0832b;
+  --accent-tint: #fdf0e2;
+  --accent-ink: #9a5412;
+  --success: #15803d;
+  --success-tint: #e7f6ec;
   --warning: #b7791f;
-  --warning-tint: #fbf0dc;
+  --warning-tint: #fdf3df;
   --warning-ink: #8a5a12;
-  --danger: #b42318;
-  --danger-tint: #fceae8;
+  --danger: #c0352b;
+  --danger-tint: #fdecea;
   --level-analyst: #64748b;
   --level-consultant: #0e7490;
-  --level-manager: #0b3d5c;
-  --level-director: #c8963e;
+  --level-manager: #1f6fae;
+  --level-director: #e0832b;
   --mood-from: #fdecea;
-  --mood-to: #b42318;
+  --mood-to: #c0352b;
+  /* Hero sky gradient and glass surfaces. */
+  --sky-top: #4f97cf;
+  --sky-mid: #7db6e1;
+  --sky-bottom: #cfe4f4;
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --shadow-color: 15 40 70;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f1115;
-    --surface: #171a21;
-    --subtle: #1c2029;
-    --hover: #222733;
-    --ink: #f3f4f6;
-    --ink-2: #d1d5db;
-    --muted: #9ca3af;
-    --faint: #6b7280;
-    --border: #262b36;
-    --border-strong: #3a4150;
-    --divider: #1f242d;
-    --primary: #5ba4d6;
-    --primary-hover: #7fb8e0;
-    --primary-tint: #16283a;
-    --on-primary: #0f1115;
-    --accent: #e0b566;
-    --accent-tint: #3a2f1a;
-    --accent-ink: #e0b566;
+    --bg: #0b1320;
+    --surface: #111c2c;
+    --subtle: #142134;
+    --hover: #1a2a40;
+    --ink: #eef3f8;
+    --ink-2: #c9d5e3;
+    --muted: #93a3b8;
+    --faint: #64748b;
+    --border: #1f2f45;
+    --border-strong: #2f4561;
+    --divider: #182639;
+    --primary: #6cb4ea;
+    --primary-hover: #8fc6ef;
+    --primary-tint: #13304a;
+    --primary-2: #9fd2f5;
+    --level-analyst: #94a3b8;
+    --level-consultant: #38bdd8;
+    --on-primary: #08121e;
+    --accent: #f2a65a;
+    --accent-tint: #3a2a17;
+    --accent-ink: #f2a65a;
     --success: #4cc38a;
-    --success-tint: #173327;
+    --success-tint: #13301f;
     --warning: #f2b84b;
     --warning-tint: #3a2e14;
     --warning-ink: #f2b84b;
     --danger: #f97066;
     --danger-tint: #3a1d1d;
-    --level-manager: #5ba4d6;
-    --level-director: #e0b566;
+    --level-manager: #6cb4ea;
+    --level-director: #f2a65a;
     --mood-from: #3a1d1d;
     --mood-to: #f97066;
+    --sky-top: #0e2a47;
+    --sky-mid: #163b5f;
+    --sky-bottom: #0b1320;
+    --glass: rgba(17, 28, 44, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --shadow-color: 0 0 0;
   }
 }
 
@@ -102,8 +120,23 @@
   --color-level-consultant: var(--level-consultant);
   --color-level-manager: var(--level-manager);
   --color-level-director: var(--level-director);
+  --color-sky-top: var(--sky-top);
+  --color-sky-mid: var(--sky-mid);
+  --color-sky-bottom: var(--sky-bottom);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
   --font-sans: var(--font-inter), Inter, system-ui, sans-serif;
-  --font-serif: var(--font-serif4), "Source Serif 4", Georgia, serif;
+  /* Display face for headings. Kept on the `font-serif` utility so existing headings pick it up. */
+  --font-serif: var(--font-display), "Inter Tight", var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-display), "Inter Tight", var(--font-inter), system-ui, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-2xl: 28px;
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-color) / 0.05), 0 1px 3px rgb(var(--shadow-color) / 0.06);
+  --shadow-md: 0 2px 4px rgb(var(--shadow-color) / 0.04), 0 8px 24px rgb(var(--shadow-color) / 0.07);
+  --shadow-lg: 0 4px 8px rgb(var(--shadow-color) / 0.05), 0 20px 48px rgb(var(--shadow-color) / 0.12);
 }
 
 * {
@@ -132,11 +165,41 @@ body {
   }
 }
 
+/* Headings: tight display tracking, like the marketing site. */
+.font-serif {
+  letter-spacing: -0.02em;
+}
+
+/* Frosted glass card for use over the sky gradient. */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+
+/* Sky gradient with soft painted clouds; used by the landing hero, auth and the app header band. */
+.sky {
+  background:
+    radial-gradient(60% 50% at 15% 85%, rgba(255, 255, 255, 0.75), transparent 70%),
+    radial-gradient(45% 35% at 85% 75%, rgba(255, 255, 255, 0.55), transparent 70%),
+    radial-gradient(30% 25% at 70% 20%, rgba(255, 255, 255, 0.35), transparent 70%),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 55%, var(--sky-bottom) 100%);
+}
+
+/* Two-tone heading: second line in the primary colour ("become truly fluent"). */
+.text-gradient {
+  background: linear-gradient(90deg, var(--primary), var(--primary-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 /* Small uppercase label used across cards ("TODAY'S REP", "BRIEFING"). */
 .eyebrow {
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -151,5 +214,11 @@ body {
   }
   a[href]::after {
     content: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
   }
 }

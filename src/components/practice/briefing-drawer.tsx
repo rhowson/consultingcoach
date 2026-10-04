@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/card";
 import { CompetencyChip, DifficultyDots, LevelBadge } from "@/components/ui/badges";
 import { PersonaAvatar } from "@/components/ui/avatar";
+import { IconChip } from "@/components/ui/icons";
 import type { HubScenario } from "./practice-hub";
 
 type Detail = Awaited<ReturnType<typeof api.scenarios.get>>;
@@ -63,36 +64,45 @@ export function BriefingDrawer({ scenario, targetLevel, onClose }: { scenario: H
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-y-0 right-0 left-auto m-0 flex h-dvh max-h-dvh w-full max-w-[520px] flex-col border-0 border-l border-border bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/40 open:flex [&:not([open])]:hidden"
+      className="fixed inset-y-0 right-0 left-auto m-0 flex h-dvh max-h-dvh w-full max-w-[520px] flex-col overflow-hidden border-0 bg-surface p-0 text-ink shadow-lg backdrop:bg-black/40 backdrop:backdrop-blur-[2px] open:flex sm:rounded-l-2xl [&:not([open])]:hidden"
     >
-      <div className="flex items-center gap-3 border-b border-border px-6 py-4">
-        {persona ? (
-          <>
-            <PersonaAvatar id={persona.id} name={persona.name} />
-            <div className="flex min-w-0 flex-1 flex-col leading-snug">
-              <span className="text-sm font-semibold">{persona.name}</span>
-              <span className="truncate text-[13px] text-muted">
-                {persona.title}, {persona.company}
-              </span>
-            </div>
-          </>
-        ) : (
-          <Eyebrow className="flex-1">Briefing</Eyebrow>
-        )}
+      <div className="sky flex items-center gap-3 px-5 pt-5 pb-6">
+        <div className="glass flex min-w-0 flex-1 items-center gap-3 rounded-lg p-3 shadow-sm">
+          {persona ? (
+            <>
+              <PersonaAvatar id={persona.id} name={persona.name} size={44} />
+              <div className="flex min-w-0 flex-1 flex-col leading-snug">
+                <span className="eyebrow text-[11px]">Your client</span>
+                <span className="text-sm font-semibold">{persona.name}</span>
+                <span className="truncate text-[13px] text-ink-2">
+                  {persona.title}, {persona.company}
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <IconChip Icon={MessagesSquare} />
+              <Eyebrow className="flex-1">Briefing</Eyebrow>
+            </>
+          )}
+        </div>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close briefing"
-          className="flex h-9 w-9 flex-none items-center justify-center rounded-md bg-transparent text-ink-2 hover:bg-hover"
+          className="glass flex h-10 w-10 flex-none cursor-pointer items-center justify-center self-start rounded-full text-ink shadow-sm transition-colors hover:bg-surface"
         >
-          <X size={20} aria-hidden />
+          <X size={18} aria-hidden />
         </button>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-6 py-6">
         <div className="flex flex-col gap-3">
-          <Eyebrow>Client Simulator</Eyebrow>
-          <h2 id="brief-title" className="m-0 font-serif text-[26px] leading-tight font-semibold tracking-tight">
+          <span className="inline-flex h-6 items-center gap-1.5 self-start rounded-full bg-primary-tint px-2.5 text-xs font-semibold text-primary">
+            <MessagesSquare size={13} aria-hidden />
+            Client Simulator
+          </span>
+          <h2 id="brief-title" className="m-0 font-display text-[26px] leading-tight font-semibold tracking-tight">
             {scenario.title}
           </h2>
           <p className="m-0 text-[15px] text-ink-2">{scenario.summary}</p>
@@ -118,7 +128,7 @@ export function BriefingDrawer({ scenario, targetLevel, onClose }: { scenario: H
         </div>
 
         {loadError && (
-          <p role="alert" className="m-0 rounded-md bg-danger-tint px-3.5 py-3 text-sm text-danger">
+          <p role="alert" className="m-0 rounded-lg bg-danger-tint px-4 py-3 text-sm text-danger">
             {loadError}
           </p>
         )}
@@ -142,12 +152,12 @@ export function BriefingDrawer({ scenario, targetLevel, onClose }: { scenario: H
                 <span className="font-semibold">Your role</span>
                 <span className="text-ink-2">{briefing.yourRole}</span>
               </div>
-              <div className="flex flex-col gap-1 rounded-md bg-subtle px-3.5 py-3">
-                <span className="flex items-center gap-1.5 font-semibold">
-                  <Target size={16} className="text-primary" aria-hidden />
-                  Objective
+              <div className="flex items-start gap-3 rounded-lg border border-primary/15 bg-subtle px-4 py-3.5">
+                <IconChip Icon={Target} size="sm" />
+                <span className="flex flex-col gap-0.5">
+                  <span className="font-semibold">Objective</span>
+                  <span>{briefing.objective}</span>
                 </span>
-                <span>{briefing.objective}</span>
               </div>
             </div>
 
@@ -174,7 +184,7 @@ export function BriefingDrawer({ scenario, targetLevel, onClose }: { scenario: H
                     return (
                       <li
                         key={l}
-                        className={`flex flex-col gap-1.5 rounded-md border px-3.5 py-3 text-sm ${mine ? "border-accent bg-accent-tint/40" : "border-border"}`}
+                        className={`flex flex-col gap-2 rounded-lg border px-4 py-3 text-sm ${mine ? "border-accent/60 bg-accent-tint/50" : "border-border"}`}
                       >
                         <span className="flex items-center gap-2">
                           <LevelBadge level={l} solid={mine} />
@@ -193,8 +203,10 @@ export function BriefingDrawer({ scenario, targetLevel, onClose }: { scenario: H
                 <Eyebrow id="brief-rubric">How you&apos;ll be scored</Eyebrow>
                 <ul className="m-0 flex list-none flex-col gap-3 p-0">
                   {detail.rubric.criteria.map((c) => (
-                    <li key={c.id} className="flex items-start gap-2.5 text-sm">
-                      <Check size={16} className="mt-0.5 flex-none text-success" aria-hidden />
+                    <li key={c.id} className="flex items-start gap-3 text-sm">
+                      <span aria-hidden className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-success-tint text-success">
+                        <Check size={12} strokeWidth={3} />
+                      </span>
                       <span className="flex flex-col gap-0.5">
                         <span className="font-semibold">
                           {c.label} <span className="font-normal text-muted">· {COMPETENCY_LABELS[c.competency]}</span>
@@ -211,7 +223,7 @@ export function BriefingDrawer({ scenario, targetLevel, onClose }: { scenario: H
         )}
       </div>
 
-      <div className="flex flex-col gap-2 border-t border-border bg-surface px-6 py-4">
+      <div className="flex flex-col gap-2 border-t border-border bg-surface px-6 py-4 shadow-[0_-8px_24px_-12px_rgb(var(--shadow-color)/0.12)]">
         {startError && (
           <p role="alert" className="m-0 text-sm text-danger">
             {startError}

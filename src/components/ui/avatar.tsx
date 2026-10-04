@@ -20,7 +20,7 @@ export function initials(name: string) {
     .join("");
 }
 
-/** Square serif-initial avatar for AI personas. */
+/** Rounded-square display-initial avatar for AI personas. */
 export function PersonaAvatar({
   id,
   name,
@@ -36,12 +36,12 @@ export function PersonaAvatar({
   return (
     <div
       aria-hidden
-      className="flex flex-none items-center justify-center rounded-lg font-serif font-semibold text-white"
+      className="flex flex-none items-center justify-center rounded-[30%] font-display font-semibold tracking-tight text-white shadow-sm"
       style={{
         width: size,
         height: size,
         fontSize: Math.round(size * 0.4),
-        background: PERSONA_BG[id] ?? "#475569",
+        background: PERSONA_BG[id] ?? "var(--level-analyst)",
         boxShadow: ring ? `0 0 0 2px var(--surface), 0 0 0 4px ${ring}` : undefined,
       }}
     >
@@ -55,8 +55,8 @@ export function UserAvatar({ name, size = 32 }: { name: string; size?: number })
   return (
     <div
       aria-hidden
-      className="flex flex-none items-center justify-center rounded-full bg-border text-xs font-semibold text-ink"
-      style={{ width: size, height: size }}
+      className="flex flex-none items-center justify-center rounded-full bg-primary-tint font-semibold text-primary ring-2 ring-surface"
+      style={{ width: size, height: size, fontSize: Math.max(11, Math.round(size * 0.38)) }}
     >
       {initials(name)}
     </div>

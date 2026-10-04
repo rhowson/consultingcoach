@@ -3,6 +3,6 @@ import { requirePageUser } from "@/lib/page-auth";
 import { getShellData } from "@/lib/services/progress";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const user = await requirePageUser();
+  const user = await requirePageUser({ allowAssessor: true });
   return <AppShell data={await getShellData(user)}>{children}</AppShell>;
 }

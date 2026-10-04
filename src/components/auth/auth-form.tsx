@@ -7,16 +7,17 @@ import { CircleAlert } from "lucide-react";
 import { api, ApiError } from "@/lib/client/api";
 import { Button } from "@/components/ui/button";
 
-export function AuthForm({ mode }: { mode: "login" | "signup" }) {
+export function AuthForm({ mode, requiresAccessCode = false }: { mode: "login" | "signup"; requiresAccessCode?: boolean }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function submit(values: { email: string; password: string; name?: string }) {
+  async function submit(values: { email: string; password: string; name?: string; accessCode?: string }) {
     setBusy(true);
     setError(null);
     try {
-      if (mode === "signup") await api.auth.signup({ email: values.email, password: values.password, name: values.name ?? "" });
+      if (mode === "signup")
+        await api.auth.signup({ email: values.email, password: values.password, name: values.name ?? "", accessCode: values.accessCode || undefined });
       else await api.auth.login(values);
       router.replace(mode === "signup" ? "/onboarding" : "/");
       router.refresh();
@@ -49,7 +50,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           onSubmit={(e) => {
             e.preventDefault();
             const f = new FormData(e.currentTarget);
-            submit({ email: String(f.get("email")), password: String(f.get("password")), name: String(f.get("name") ?? "") });
+            submit({ email: String(f.get("email")), password: String(f.get("password")), name: String(f.get("name") ?? ""), accessCode: String(f.get("accessCode") ?? "") });
           }}
         >
           {mode === "signup" && <Field label="Name" name="name" autoComplete="name" required />}
@@ -62,6 +63,9 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             minLength={mode === "signup" ? 8 : undefined}
             required
           />
+          {mode === "signup" && requiresAccessCode && (
+            <Field label="Access code" name="accessCode" autoComplete="off" required />
+          )}
           {error && (
             <p role="alert" className="m-0 flex items-center gap-1.5 text-sm text-danger">
               <CircleAlert size={16} aria-hidden />

@@ -175,7 +175,7 @@ export function OnboardingWizard({
       )}
 
       {step === 1 && (
-        <Step title="What are you working toward?" lead="This shapes the reps we suggest first.">
+        <Step title="What are you working towards?" lead="This shapes the reps we suggest first.">
           <fieldset className="m-0 border-0 p-0">
             <legend className="sr-only">Goal</legend>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

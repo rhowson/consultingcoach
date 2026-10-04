@@ -27,7 +27,7 @@ async function loadOwned(user: User, id: string) {
 }
 
 export async function listCases() {
-  const rows = await db.query.scenarios.findMany({ where: eq(schema.scenarios.kind, "storyboard") });
+  const rows = await db.query.scenarios.findMany({ where: and(eq(schema.scenarios.kind, "storyboard"), eq(schema.scenarios.active, true)) });
   return rows.map(publicScenario);
 }
 

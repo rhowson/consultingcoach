@@ -2,7 +2,7 @@ import type { Exhibit } from "@/lib/types";
 
 export interface ExhibitBar {
   label: string;
-  /** Display value as written in the exhibit ("4.3%", "$149"). */
+  /** Display value as written in the exhibit ("4.3%", "£69"). */
   display: string;
   value: number;
   /** 0–100, relative to the largest bar. */
@@ -11,6 +11,9 @@ export interface ExhibitBar {
 }
 
 const NUM = /[-+]?[$£€]?\d+(?:[.,]\d+)?\s*[%mkMbB]?/g;
+
+/** A value cell starts with a number ("71%", "£9.1", "9–12"); label cells like "FY23" or "P1 incidents" don't. */
+const startsNumeric = (c: string) => /^[-+]?[$£€]?\d/.test(c);
 
 function lastNumber(cell: string): { display: string; value: number } | null {
   const matches = cell.replace(/\([^)]*\)/g, "").match(NUM);
@@ -36,8 +39,8 @@ export function exhibitBars(ex: Exhibit | undefined, max = 8): ExhibitBar[] {
   let bestSpread = -1;
   for (const row of rows) {
     if (row === header) continue;
-    // Tables with a row label ("SMB | 2.1% | …") vs. inline "label value" cells ("Q1 4.1 | Q2 4.3").
-    const labelled = row.length > 1 && !lastNumber(row[0]);
+    // Tables with a row label ("Claims | 71% | …") vs. inline "label value" cells ("Q1 4.1 | Q2 4.3").
+    const labelled = row.length > 1 && !startsNumeric(row[0]) && row.slice(1).every((c) => !c || startsNumeric(c));
     const cells = labelled ? row.slice(1) : row;
     const points = cells
       .map((c, i) => {
@@ -56,10 +59,10 @@ export function exhibitBars(ex: Exhibit | undefined, max = 8): ExhibitBar[] {
       best = points;
     }
   }
-  // Two-column tables ("Brightwave | $189"): one bar per row.
+  // Two-column tables ("Brightwave | £89"): one bar per row.
   if (best.length < 2) {
     best = rows
-      .filter((r) => r !== header && r.length > 1 && !lastNumber(r[0]))
+      .filter((r) => r !== header && r.length > 1 && !startsNumeric(r[0]))
       .map((r) => {
         const n = lastNumber(r[r.length - 1]);
         return n ? { label: r[0], ...n } : null;

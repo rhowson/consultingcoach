@@ -4,6 +4,7 @@ import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { ArrowRight, Presentation, SearchX } from "lucide-react";
 import type { Persona, Scenario } from "@/lib/client/api";
 import { COMPETENCIES, COMPETENCY_LABELS, LEVELS, LEVEL_LABELS, type Competency, type Level } from "@/lib/competency";
+import { PRACTICE_AREAS, PRACTICE_AREA_SHORT, type PracticeArea } from "@/lib/practice-areas";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ScenarioCard } from "./scenario-card";
@@ -34,6 +35,7 @@ export function PracticeHub({
   const [tab, setTab] = useState<Tab>(startScenario?.kind ?? "simulation");
   const [competency, setCompetency] = useState<Competency | "">("");
   const [level, setLevel] = useState<Level | "">("");
+  const [area, setArea] = useState<PracticeArea | "">("");
   const [openId, setOpenId] = useState<string | null>(startScenario?.kind === "simulation" ? startScenario.id : null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -47,6 +49,7 @@ export function PracticeHub({
     .filter((s) => s.kind === tab)
     .filter((s) => !competency || s.competencies.includes(competency))
     .filter((s) => !level || s.targetLevel === level)
+    .filter((s) => !area || s.practiceArea === area)
     .sort((a, b) => Number(a.isPro) - Number(b.isPro));
 
   const open = openId ? scenarios.find((s) => s.id === openId) : undefined;
@@ -72,7 +75,7 @@ export function PracticeHub({
     tabRefs.current[next]?.focus();
   }
 
-  const filtered = Boolean(competency || level);
+  const filtered = Boolean(competency || level || area);
 
   return (
     <div className="flex flex-col gap-6">
@@ -108,6 +111,17 @@ export function PracticeHub({
         </div>
         {tab !== "rehearsal" && (
           <div className="flex flex-wrap items-center gap-2 pb-3">
+            <label className="sr-only" htmlFor="filter-area">
+              Practice area
+            </label>
+            <select id="filter-area" value={area} onChange={(e) => setArea(e.target.value as PracticeArea | "")} className={SELECT}>
+              <option value="">All practice areas</option>
+              {PRACTICE_AREAS.map((a) => (
+                <option key={a} value={a}>
+                  {PRACTICE_AREA_SHORT[a]}
+                </option>
+              ))}
+            </select>
             <label className="sr-only" htmlFor="filter-competency">
               Competency
             </label>
@@ -165,6 +179,7 @@ export function PracticeHub({
                 onClick={() => {
                   setCompetency("");
                   setLevel("");
+                  setArea("");
                 }}
               >
                 Clear filters

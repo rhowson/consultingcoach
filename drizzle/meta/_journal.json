@@ -15,6 +15,20 @@
       "when": 1791132683921,
       "tag": "0001_login_lockout",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791133069035,
+      "tag": "0002_report_scoring_model",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791137081300,
+      "tag": "0003_practice_areas",
+      "breakpoints": true
     }
   ]
 }

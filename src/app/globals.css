@@ -144,3 +144,12 @@ body {
 .tabular {
   font-variant-numeric: tabular-nums;
 }
+
+@media print {
+  body {
+    background: #fff;
+  }
+  a[href]::after {
+    content: none;
+  }
+}

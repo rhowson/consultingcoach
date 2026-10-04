@@ -6,6 +6,8 @@ const schema = z.object({
   ANTHROPIC_API_KEY: z.string().optional(),
   AI_MODEL: z.string().default("claude-opus-5"),
   AI_MOCK: z.string().optional(),
+  /** When set, new accounts need this code to sign up (invite-only assessments). */
+  SIGNUP_ACCESS_CODE: z.string().optional(),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
@@ -18,5 +20,17 @@ export function authSecret(): Uint8Array {
   return new TextEncoder().encode("dev-only-secret-not-for-production");
 }
 
-/** Mock mode runs the AI engine on scripted responses so the app works without an API key. */
-export const aiMockMode = env.AI_MOCK === "1" || !env.ANTHROPIC_API_KEY;
+/**
+ * How the AI engine runs:
+ * - "live": Claude API (ANTHROPIC_API_KEY set).
+ * - "mock": scripted responses and heuristic scores. Only when AI_MOCK=1, or in development without a key.
+ * - "off": production without a key. AI features return a clear error rather than fake scores —
+ *   the app is used for assessments, so a missing key must never produce simulated results.
+ */
+export const aiMode: "live" | "mock" | "off" =
+  env.AI_MOCK === "1" ? "mock" : env.ANTHROPIC_API_KEY ? "live" : env.NODE_ENV === "production" ? "off" : "mock";
+
+export const aiMockMode = aiMode === "mock";
+
+/** Recorded on every feedback report so a score can be traced to what produced it. */
+export const scoringModel = aiMode === "mock" ? "mock" : env.AI_MODEL;

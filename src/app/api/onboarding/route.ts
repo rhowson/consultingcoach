@@ -6,7 +6,7 @@ import { completeOnboarding, diagnosticQuestions } from "@/lib/services/onboardi
 /** Diagnostic content for the onboarding wizard. The mini-simulation uses POST /api/simulations. */
 export const GET = route(async () => {
   await requireUser();
-  return json({ diagnosticScenarioId: "savings-number-wrong", diagnosticMaxTurns: 3, titleQuiz: diagnosticQuestions() });
+  return json({ diagnosticScenarioId: "benefits-case-challenge", diagnosticMaxTurns: 3, titleQuiz: diagnosticQuestions() });
 });
 
 const rating = z.number().min(1).max(5);

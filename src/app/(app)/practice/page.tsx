@@ -11,7 +11,7 @@ export default async function PracticePage({ searchParams }: { searchParams: Pro
   const { start } = await searchParams;
 
   const [rows, personas, attempts] = await Promise.all([
-    db.query.scenarios.findMany(),
+    db.query.scenarios.findMany({ where: eq(schema.scenarios.active, true) }),
     db.query.personas.findMany(),
     db.query.attempts.findMany({ where: and(eq(schema.attempts.userId, user.id), eq(schema.attempts.status, "completed")) }),
   ]);

@@ -208,7 +208,7 @@ export function MiniSim({
           )}
           {phase === "done" && (
             <p role="status" className="m-0 flex items-center gap-2 border-t border-border bg-success-tint px-4 py-3 text-sm font-medium text-success">
-              <CircleCheck size={16} aria-hidden /> Conversation scored. It will count toward your placement.
+              <CircleCheck size={16} aria-hidden /> Conversation scored. It will count towards your placement.
             </p>
           )}
         </div>

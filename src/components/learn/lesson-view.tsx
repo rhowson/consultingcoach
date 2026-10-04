@@ -121,7 +121,7 @@ export function LessonView({ lesson }: { lesson: LessonData }) {
             </span>
           )}
           <span className="text-sm text-muted">
-            {completed ? "Lesson complete. You can re-save after retaking the quiz." : "Mark the lesson complete to count it toward your plan."}
+            {completed ? "Lesson complete. You can re-save after retaking the quiz." : "Mark the lesson complete to count it towards your plan."}
           </span>
           {error && (
             <span role="alert" className="flex items-center gap-1.5 text-sm text-danger">

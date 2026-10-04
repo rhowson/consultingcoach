@@ -4,11 +4,11 @@
  */
 import bcrypt from "bcryptjs";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { Pool } from "pg";
 import * as schema from "./schema";
 import { personas } from "../content/personas";
-import { rubrics, scenarios } from "../content/scenarios";
+import { retiredScenarioIds, rubrics, scenarios } from "../content/scenarios";
 import { lessons, tracks } from "../content/lessons";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -32,7 +32,12 @@ async function upsert<T extends Record<string, unknown>>(table: Parameters<typeo
 // Content (order matters for foreign keys)
 await upsert(schema.personas, personas, ["id"]);
 await upsert(schema.rubrics, rubrics, ["id"]);
-for (const s of scenarios) await upsert(schema.scenarios, [{ openingLine: null, personaId: null, casePack: null, isPro: false, ...s }], ["id"]);
+for (const s of scenarios)
+  await upsert(schema.scenarios, [{ openingLine: null, personaId: null, casePack: null, isPro: false, practiceArea: null, active: true, ...s }], ["id"]);
+// Retired scenarios stay for old attempts and reports, but leave the catalogue.
+if (retiredScenarioIds.length) {
+  await db.update(schema.scenarios).set({ active: false }).where(inArray(schema.scenarios.id, retiredScenarioIds));
+}
 await upsert(schema.tracks, tracks, ["id"]);
 for (const l of lessons) await upsert(schema.lessons, [{ practiceScenarioId: null, ...l }], ["id"]);
 
@@ -76,20 +81,23 @@ for (const [competency, score] of Object.entries(demoScores)) {
     .onConflictDoNothing();
 }
 
-// Demo development plan (only if Priya has none yet), focused on her biggest gap.
+// Demo development plan. Recreated if the current one points at retired scenarios.
+const activeIds = new Set(scenarios.map((s) => s.id));
 const existingPlan = await db.query.developmentPlans.findFirst({
   where: (p, { and, eq }) => and(eq(p.userId, demo.id), eq(p.active, true)),
 });
-if (!existingPlan) {
+const planIsStale = existingPlan?.weeks.some((w) => w.items.some((i) => i.kind === "scenario" && !activeIds.has(i.refId)));
+if (!existingPlan || planIsStale) {
+  if (existingPlan) await db.update(schema.developmentPlans).set({ active: false }).where(eq(schema.developmentPlans.id, existingPlan.id));
   const item = (kind: "lesson" | "scenario", refId: string, title: string) => ({ kind, refId, title });
   await db.insert(schema.developmentPlans).values({
     userId: demo.id,
     focus: "difficult_conversations",
     weeks: [
-      { week: 1, theme: "Name the problem", items: [item("lesson", "pushback-acknowledge", "Acknowledge before you argue"), item("scenario", "savings-number-wrong", "Your savings number is wrong")] },
-      { week: 2, theme: "Repair before you defend", items: [item("scenario", "leaked-findings", "The leaked findings"), item("lesson", "scope-options", "Offer options, not refusals"), item("scenario", "while-youre-here", "While you're here…")] },
-      { week: 3, theme: "Tell the story", items: [item("lesson", "pyramid-answer-first", "Answer first"), item("lesson", "pyramid-mece", "MECE key lines"), item("scenario", "brightwave-churn", "Brightwave Telecom: why is churn rising?")] },
-      { week: 4, theme: "Bar check", items: [item("scenario", "leaked-findings", "The leaked findings (retry at the Manager bar)"), item("scenario", "ten-minute-ceo", "The 10-minute CEO")] },
+      { week: 1, theme: "Name the problem", items: [item("lesson", "pushback-acknowledge", "Acknowledge before you argue"), item("scenario", "benefits-case-challenge", "Your benefits case is wrong")] },
+      { week: 2, theme: "Bad news with a path", items: [item("lesson", "bad-news-early", "Bad news early, with a path"), item("scenario", "genai-pilot-not-ready", "The pilot isn't ready"), item("scenario", "scope-creep-crm", "While you're here…")] },
+      { week: 3, theme: "Hold the room", items: [item("lesson", "honest-rag", "Report the real RAG"), item("scenario", "watermelon-status", "Green on the outside"), item("scenario", "meridian-data-platform", "Meridian Insurance: why hasn't the £14m data platform delivered?")] },
+      { week: 4, theme: "Bar check", items: [item("scenario", "operating-model-leak", "The leaked operating model"), item("scenario", "cloud-bill-shock", "The cloud bill shock")] },
     ],
   });
 }

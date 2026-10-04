@@ -29,7 +29,7 @@ export function ExitDialog({ onCancel, onLeave, leaving }: { onCancel: () => voi
           Leave this session?
         </h2>
         <p id="exit-desc" className="m-0 text-sm text-ink-2">
-          Your transcript is saved, but this rep won&apos;t be scored or count toward your streak.
+          Your transcript is saved, but this rep won&apos;t be scored or count towards your streak.
         </p>
         <div className="mt-2 flex justify-end gap-2">
           <button

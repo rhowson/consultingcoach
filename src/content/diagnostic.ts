@@ -2,23 +2,23 @@
 export const titleQuiz = [
   {
     id: "q1",
-    exhibit: "SMB churn by months since contract end: in contract 1.1%; 0–3 months out 6.8%; 3–12 months 4.9%; 12+ months 2.7%.",
+    exhibit: "Data platform use cases: 3 live, 4 in build, 8 blocked by data quality, 5 blocked because no business owner. Spend to date: £14m.",
     options: [
-      "SMB churn by contract status",
-      "Churn analysis overview",
-      "SMB customers are 6x more likely to leave in the 3 months after their contract ends",
-      "Churn is a problem we need to look at",
+      "Data platform use case status",
+      "Overview of the data programme",
+      "Thirteen of 20 use cases are blocked by data quality or ownership, not by the platform",
+      "The data platform needs more investment",
     ],
     answerIndex: 2,
   },
   {
     id: "q2",
-    exhibit: "Call-centre wait time was flat at 4.1–4.4 minutes across six quarters while churn rose.",
+    exhibit: "Five-year cost of IT services: renew £56.0m, re-tender £47.9m, insource £49.8m (insourcing needs 46 new hires and £6.8m up front).",
     options: [
-      "Service levels held steady, so service is not driving the churn increase",
-      "Call-centre wait times, Q1–Q6",
-      "Wait times are important to customers",
-      "We analysed call-centre data",
+      "Re-tendering is £8.1m cheaper than renewing and avoids the hiring risk of insourcing",
+      "Sourcing options cost comparison (£m)",
+      "Costs vary across the three options",
+      "We analysed the cost of each sourcing option",
     ],
     answerIndex: 0,
   },

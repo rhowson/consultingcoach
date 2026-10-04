@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Clock, Lock, Presentation } from "lucide-react";
+import { PRACTICE_AREA_LABELS } from "@/lib/practice-areas";
 import { CompetencyChip, DifficultyDots, LevelBadge } from "@/components/ui/badges";
 import { PersonaAvatar } from "@/components/ui/avatar";
 import type { HubScenario } from "./practice-hub";
@@ -37,6 +38,9 @@ export function ScenarioCard({ scenario, onOpen }: { scenario: HubScenario; onOp
           Pro
           <span className="sr-only">: unlock with Pro</span>
         </span>
+      )}
+      {s.practiceArea && (
+        <span className="eyebrow text-[11px] text-primary">{PRACTICE_AREA_LABELS[s.practiceArea]}</span>
       )}
       <span className={`flex flex-wrap gap-1.5 ${s.isPro ? "opacity-60" : ""}`}>
         {s.competencies.map((c) => (

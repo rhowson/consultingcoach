@@ -12,6 +12,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import type { Competency, Level, Verdict } from "@/lib/competency";
+import type { PracticeArea } from "@/lib/practice-areas";
 import type {
   Briefing,
   CasePack,
@@ -117,6 +118,9 @@ export const scenarios = pgTable("scenarios", {
   maxTurns: integer("max_turns").notNull().default(12),
   casePack: jsonb("case_pack").$type<CasePack>(),
   isPro: boolean("is_pro").notNull().default(false),
+  practiceArea: text("practice_area").$type<PracticeArea>(),
+  /** Retired scenarios stay for history (old attempts and reports) but are hidden from the catalogue. */
+  active: boolean("active").notNull().default(true),
 });
 
 export const tracks = pgTable("tracks", {
@@ -187,6 +191,8 @@ export const feedbackReports = pgTable("feedback_reports", {
   moments: jsonb("moments").$type<FeedbackMoment[]>().notNull(),
   topBehaviours: jsonb("top_behaviours").$type<string[]>().notNull(),
   competencyDeltas: jsonb("competency_deltas").$type<Partial<Record<Competency, number>>>().notNull(),
+  /** Model that produced the evaluation ("mock" for simulated practice scores) — audit trail for assessments. */
+  scoringModel: text("scoring_model"),
   readinessBefore: integer("readiness_before").notNull(),
   readinessAfter: integer("readiness_after").notNull(),
   createdAt: createdAt(),

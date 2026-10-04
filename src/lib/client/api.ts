@@ -61,7 +61,7 @@ const patch = <T>(path: string, json: unknown) => request<T>(path, { method: "PA
 
 export const api = {
   auth: {
-    signup: (body: { email: string; password: string; name: string }) => post<{ user: PublicUser }>("/auth/signup", body),
+    signup: (body: { email: string; password: string; name: string; accessCode?: string }) => post<{ user: PublicUser }>("/auth/signup", body),
     login: (body: { email: string; password: string }) => post<{ user: PublicUser }>("/auth/login", body),
     logout: () => post<{ ok: true }>("/auth/logout"),
   },

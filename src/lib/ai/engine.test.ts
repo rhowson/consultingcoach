@@ -6,7 +6,7 @@ import * as engine from "./engine";
 
 // AI_MOCK=1 is set in vitest.config.ts, so these exercise the mock engine end to end.
 const persona = { ...personas[1], brief: personas[1].brief as PersonaBrief };
-const s = scenarios.find((x) => x.id === "leaked-findings")!;
+const s = scenarios.find((x) => x.id === "operating-model-leak")!;
 const scenario = { title: s.title, briefing: s.briefing, objectives: s.objectives!, targetLevel: s.targetLevel };
 const rubric = rubrics.find((r) => r.id === s.rubricId)!;
 

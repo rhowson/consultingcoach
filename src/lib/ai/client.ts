@@ -2,14 +2,22 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import type { z } from "zod";
-import { env } from "@/lib/env";
+import { aiMode, env } from "@/lib/env";
 
 type Effort = "low" | "medium" | "high";
 
 let client: Anthropic | null = null;
 function getClient() {
+  if (aiMode === "off") throw new AiUnavailableError();
   client ??= new Anthropic();
   return client;
+}
+
+/** Thrown when the AI engine isn't configured (production without ANTHROPIC_API_KEY). */
+export class AiUnavailableError extends Error {
+  constructor() {
+    super("The AI coach isn't configured: ANTHROPIC_API_KEY is not set");
+  }
 }
 
 /**

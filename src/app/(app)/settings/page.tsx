@@ -1,6 +1,6 @@
 import { Bot } from "lucide-react";
 import { requirePageUser } from "@/lib/page-auth";
-import { aiMockMode } from "@/lib/env";
+import { aiMode } from "@/lib/env";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
 import { ProfileForm } from "@/components/settings/profile-form";
@@ -42,9 +42,9 @@ export default async function SettingsPage() {
       <Card className="flex items-center gap-3 p-5 text-sm">
         <Bot size={18} className="flex-none text-muted" aria-hidden />
         <span className="text-ink-2">
-          AI coach: <b className="font-semibold">{aiMockMode ? "Demo mode" : "Live"}</b>
+          AI coach: <b className="font-semibold">{aiMode === "live" ? "Live" : aiMode === "mock" ? "Practice mode" : "Not configured"}</b>
           <span className="text-muted">
-            {aiMockMode ? " — responses are scripted because no model API key is configured." : " — responses come from the live model."}
+            {aiMode === "live" ? " — responses and scores come from Claude." : aiMode === "mock" ? " — responses and scores are simulated and don't reflect real performance." : " — an administrator needs to set the Claude API key before reps can be scored."}
           </span>
         </span>
       </Card>

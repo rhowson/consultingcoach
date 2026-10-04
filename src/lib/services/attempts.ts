@@ -5,6 +5,8 @@ import { LEVELS, verdictFor, type Level } from "@/lib/competency";
 import type { User } from "@/lib/auth";
 import { HttpError, badRequest, isUuid, notFound } from "@/lib/api/http";
 import * as engine from "@/lib/ai/engine";
+import { AiUnavailableError } from "@/lib/ai/client";
+import { aiMode, scoringModel } from "@/lib/env";
 import type { PersonaContext, ScenarioContext } from "@/lib/ai/prompts";
 import type { CriterionScore, Mood, TranscriptTurn } from "@/lib/types";
 import { applyAttemptScores, publicPersona, publicScenario } from "./progress";
@@ -63,6 +65,8 @@ export async function startSimulation(
   user: User,
   input: { scenarioId: string; targetLevel?: Level; retryOf?: string; fromTurn?: number },
 ) {
+  // Don't let a rep start if it can't be answered or scored.
+  if (aiMode === "off") throw new AiUnavailableError();
   const scenario = await loadScenario(input.scenarioId);
   const persona = await loadSimulation(scenario);
   const level = input.targetLevel ?? scenario.targetLevel;
@@ -246,6 +250,7 @@ export async function finalizeAttempt(user: User, attempt: Attempt, scenario: Sc
       moments: coaching.moments,
       topBehaviours: coaching.topBehaviours,
       competencyDeltas: deltas,
+      scoringModel,
       readinessBefore,
       readinessAfter,
     });
@@ -287,6 +292,7 @@ export async function getReport(user: User, attemptId: string) {
     topBehaviours: report.topBehaviours,
     competencyDeltas: report.competencyDeltas,
     readiness: { before: report.readinessBefore, after: report.readinessAfter },
+    scoringModel: report.scoringModel,
     nextLevel: LEVELS[levelIdx + 1] ?? null,
     createdAt: report.createdAt,
   };

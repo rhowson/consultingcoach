@@ -12,7 +12,7 @@ export const GET = route(async (req) => {
   const level = url.searchParams.get("level");
 
   const [rows, attempts] = await Promise.all([
-    db.query.scenarios.findMany(),
+    db.query.scenarios.findMany({ where: eq(schema.scenarios.active, true) }),
     db.query.attempts.findMany({
       where: and(eq(schema.attempts.userId, user.id), eq(schema.attempts.status, "completed")),
     }),

@@ -83,7 +83,7 @@ export async function reviewStoryboard(pyramid: PyramidNode | null, slides: Ghos
       tag: "insight",
       severity: "must_fix",
       body: "The governing thought reads like a topic. State the answer and why it matters.",
-      suggestion: "Churn is up because out-of-contract SMB customers are leaving for cheaper bundles.",
+      suggestion: "The platform works; value is blocked by unowned, poor-quality claims and customer data.",
     });
   }
   for (const s of slides) {

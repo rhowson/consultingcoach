@@ -14,6 +14,7 @@ import {
   type Level,
 } from "@/lib/competency";
 import type { User } from "@/lib/auth";
+import { aiMode } from "@/lib/env";
 import type { CriterionScore } from "@/lib/types";
 
 export type Scores = Partial<Record<Competency, number>>;
@@ -88,23 +89,40 @@ export function readinessSummary(user: User, scores: Scores) {
   };
 }
 
-function startOfWeek(d = new Date()) {
-  const s = new Date(d);
-  const day = (s.getUTCDay() + 6) % 7; // Monday = 0
-  s.setUTCDate(s.getUTCDate() - day);
-  s.setUTCHours(0, 0, 0, 0);
-  return s;
+// Days and weeks follow UK time (Europe/London, BST-aware), not UTC.
+const UK_DAY = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/London", year: "numeric", month: "2-digit", day: "2-digit" });
+
+/** "YYYY-MM-DD" for the UK calendar day `d` falls on. */
+export function ukDayKey(d: Date) {
+  return UK_DAY.format(d);
 }
 
-/** Consecutive days (ending today or yesterday) with at least one completed rep. */
+function shiftKey(key: string, days: number) {
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + days, 12)).toISOString().slice(0, 10);
+}
+
+/** Monday = 0 … Sunday = 6 for a day key. */
+function weekdayOf(key: string) {
+  const [y, m, d] = key.split("-").map(Number);
+  return (new Date(Date.UTC(y, m - 1, d, 12)).getUTCDay() + 6) % 7;
+}
+
+/** Day key of Monday in the UK week containing `now`. */
+export function ukWeekStartKey(now = new Date()) {
+  const today = ukDayKey(now);
+  return shiftKey(today, -weekdayOf(today));
+}
+
+/** Consecutive UK days (ending today or yesterday) with at least one completed rep. */
 export function streakDays(completedDates: Date[], today = new Date()): number {
-  const days = new Set(completedDates.map((d) => d.toISOString().slice(0, 10)));
-  const cursor = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
-  if (!days.has(cursor.toISOString().slice(0, 10))) cursor.setUTCDate(cursor.getUTCDate() - 1);
+  const days = new Set(completedDates.map(ukDayKey));
+  let cursor = ukDayKey(today);
+  if (!days.has(cursor)) cursor = shiftKey(cursor, -1);
   let streak = 0;
-  while (days.has(cursor.toISOString().slice(0, 10))) {
+  while (days.has(cursor)) {
     streak++;
-    cursor.setUTCDate(cursor.getUTCDate() - 1);
+    cursor = shiftKey(cursor, -1);
   }
   return streak;
 }
@@ -127,6 +145,7 @@ export async function getShellData(user: User) {
     targetLevel: targetLevelFor(user),
     readiness: readinessPercent(scores),
     streakDays: streakDays(completed.map((a) => a.completedAt!).filter(Boolean)),
+    aiMode,
   };
 }
 
@@ -152,13 +171,15 @@ export async function getDashboard(user: User) {
   ]);
 
   const completed = recentAttempts.filter((a) => a.status === "completed" && a.completedAt);
-  const weekStart = startOfWeek();
+  const weekStart = ukWeekStartKey();
+  const inThisWeek = (d: Date) => ukDayKey(d) >= weekStart;
   const attemptedIds = new Set(recentAttempts.map((a) => a.scenarioId));
   const completedScenarioIds = new Set(completed.map((a) => a.scenarioId));
 
   // Today's rep: a scenario that trains the biggest gap, preferring ones not yet tried.
-  const candidates = scenarios.filter((s) => s.competencies.includes(gap) && !s.isPro);
-  const todaysRep = candidates.find((s) => !attemptedIds.has(s.id)) ?? candidates[0] ?? scenarios[0] ?? null;
+  const catalogue = scenarios.filter((s) => s.active && !s.isPro);
+  const candidates = catalogue.filter((s) => s.competencies.includes(gap));
+  const todaysRep = candidates.find((s) => !attemptedIds.has(s.id)) ?? candidates[0] ?? catalogue[0] ?? null;
   const repPersona = todaysRep?.personaId ? personas.find((p) => p.id === todaysRep.personaId) : undefined;
 
   const doneIds = new Set(done.map((d) => d.lessonId));
@@ -166,8 +187,8 @@ export async function getDashboard(user: User) {
   const trackById = new Map(tracks.map((t) => [t.id, t]));
 
   // Mon–Sun of the current week: did the user complete a rep that day?
-  const todayIdx = (new Date().getUTCDay() + 6) % 7;
-  const repDays = new Set(completed.filter((a) => a.completedAt! >= weekStart).map((a) => (a.completedAt!.getUTCDay() + 6) % 7));
+  const todayIdx = weekdayOf(ukDayKey(new Date()));
+  const repDays = new Set(completed.filter((a) => inThisWeek(a.completedAt!)).map((a) => weekdayOf(ukDayKey(a.completedAt!))));
   const days = ["M", "T", "W", "T", "F", "S", "S"].map((label, i) => ({
     label,
     state: repDays.has(i) ? "done" : i === todayIdx ? "today" : i < todayIdx ? "missed" : "upcoming",
@@ -200,7 +221,7 @@ export async function getDashboard(user: User) {
     },
     week: {
       goal: user.weeklyRepGoal,
-      done: completed.filter((a) => a.completedAt! >= weekStart).length,
+      done: completed.filter((a) => inThisWeek(a.completedAt!)).length,
       streakDays: streakDays(completed.map((a) => a.completedAt!)),
       days,
     },
@@ -291,6 +312,7 @@ export function publicScenario(s: typeof schema.scenarios.$inferSelect) {
     difficulty: s.difficulty,
     durationMin: s.durationMin,
     competencies: s.competencies,
+    practiceArea: s.practiceArea,
     isPro: s.isPro,
   };
 }

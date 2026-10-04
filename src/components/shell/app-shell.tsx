@@ -16,6 +16,7 @@ export interface ShellData {
   targetLevel: Level;
   readiness: number;
   streakDays: number;
+  aiMode: "live" | "mock" | "off";
 }
 
 export function AppShell({ data, children }: { data: ShellData; children: React.ReactNode }) {
@@ -27,7 +28,7 @@ export function AppShell({ data, children }: { data: ShellData; children: React.
       {/* Sidebar (desktop) */}
       <nav
         aria-label="Primary"
-        className="sticky top-0 hidden h-screen w-60 flex-none flex-col border-r border-border bg-surface px-3 py-5 lg:flex"
+        className="sticky top-0 hidden h-screen w-60 flex-none flex-col border-r border-border bg-surface px-3 py-5 lg:flex print:hidden"
       >
         <Link href="/" className="flex items-center gap-2.5 px-2.5 pt-0.5 pb-6 text-ink no-underline">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary font-serif text-base font-semibold text-on-primary">C</span>
@@ -61,7 +62,7 @@ export function AppShell({ data, children }: { data: ShellData; children: React.
       </nav>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-border bg-bg px-4 md:px-8">
+        <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-border bg-bg px-4 md:px-8 print:hidden">
           <h1 className="m-0 font-serif text-2xl font-semibold tracking-tight">{titleFor(pathname)}</h1>
           <div className="flex-1" />
           <Link
@@ -82,11 +83,18 @@ export function AppShell({ data, children }: { data: ShellData; children: React.
           </Link>
         </header>
 
+        {data.aiMode !== "live" && (
+          <div role="status" className="border-b border-border bg-warning-tint px-4 py-2 text-sm text-warning-ink md:px-8 print:hidden">
+            {data.aiMode === "mock"
+              ? "Practice mode: AI replies and scores are simulated and don't reflect real performance."
+              : "The AI coach isn't configured yet, so reps can't be started or scored. An administrator needs to add the Claude API key."}
+          </div>
+        )}
         <main className="w-full max-w-[1240px] px-4 pt-8 pb-24 md:px-8 lg:pb-12">{children}</main>
       </div>
 
       {/* Bottom tab bar (mobile) */}
-      <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-20 grid h-[68px] grid-cols-5 border-t border-border bg-surface lg:hidden">
+      <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-20 grid h-[68px] grid-cols-5 border-t border-border bg-surface lg:hidden print:hidden">
         {NAV.filter((n) => n.mobile).map(({ href, label, Icon }) => {
           const active = isActive(pathname, href);
           return (

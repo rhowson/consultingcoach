@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { PrintButton } from "@/components/feedback/print-button";
 import { ArrowRight, Hourglass, Play, RotateCcw, TrendingUp } from "lucide-react";
 import { requirePageUser } from "@/lib/page-auth";
 import { getReport, loadOwnedAttempt } from "@/lib/services/attempts";
@@ -47,9 +48,12 @@ export default async function FeedbackPage({ params }: { params: Promise<{ attem
     <div className="mx-auto flex w-full max-w-[820px] flex-col gap-8">
       {/* Header */}
       <header className="flex flex-col gap-4">
-        <Eyebrow>
-          {MODE_LABEL[attempt.mode]} · {date}
-        </Eyebrow>
+        <div className="flex items-center justify-between gap-3">
+          <Eyebrow>
+            {MODE_LABEL[attempt.mode]} · {date}
+          </Eyebrow>
+          <PrintButton />
+        </div>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 flex-col gap-2">
             <h2 className="m-0 font-serif text-[28px] leading-tight font-semibold tracking-tight md:text-[32px]">{scenario.title}</h2>
@@ -70,6 +74,11 @@ export default async function FeedbackPage({ params }: { params: Promise<{ attem
           <span className="flex items-center gap-1.5">
             Target <LevelBadge level={attempt.targetLevel} />
           </span>
+          {report.scoringModel === "mock" ? (
+            <span className="rounded-full bg-warning-tint px-2 py-px text-xs font-semibold text-warning-ink">Simulated score (practice mode)</span>
+          ) : report.scoringModel ? (
+            <span className="text-xs">Scored by {report.scoringModel}</span>
+          ) : null}
         </div>
         {report.summary && <p className="m-0 max-w-[680px] text-[15px] text-ink-2">{report.summary}</p>}
       </header>

@@ -4,6 +4,10 @@ const PERSONA_BG: Record<string, string> = {
   "david-okafor": "#3F5B3A",
   "sofia-alvarez": "#6B4E8A",
   "james-whitfield": "#2F4858",
+  "graham-holt": "#5B4636",
+  "amara-osei": "#7A3E65",
+  "mark-bennett": "#335C67",
+  "gareth-lloyd": "#4A5D23",
 };
 
 export function initials(name: string) {

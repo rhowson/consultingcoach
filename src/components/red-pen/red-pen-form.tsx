@@ -106,11 +106,11 @@ export function RedPenForm({ defaultLevel }: { defaultLevel: Level }) {
           maxLength={MAX}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder={"Slide 1 — Executive summary\nSMB churn doubled after contract end, driven by …"}
+          placeholder={"Slide 1 — Executive summary\nRe-tendering IT services saves £8.1m over five years, because …"}
           className={`${fieldClass} h-auto min-h-[280px] resize-y py-2.5 leading-relaxed`}
         />
         <span id="rp-count" className="tabular self-end text-xs text-muted">
-          {content.length.toLocaleString()} / {MAX.toLocaleString()} characters
+          {content.length.toLocaleString("en-GB")} / {MAX.toLocaleString("en-GB")} characters
         </span>
       </div>
 

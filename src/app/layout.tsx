@@ -8,11 +8,13 @@ const serif = Source_Serif_4({ subsets: ["latin"], weight: ["600"], variable: "-
 export const metadata: Metadata = {
   title: "Consulting Coach",
   description: "Practise client conversations, storylines and SteerCo delivery with an AI coach — from Analyst to Director.",
+  // Private assessment tool: keep it out of search engines.
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${serif.variable}`}>
+    <html lang="en-GB" className={`${inter.variable} ${serif.variable}`}>
       <body>{children}</body>
     </html>
   );

@@ -87,7 +87,7 @@ export async function generatePlan(user: User, scores: Scores) {
   const [tracks, lessons, scenarios] = await Promise.all([
     db.query.tracks.findMany(),
     db.query.lessons.findMany({ orderBy: [schema.lessons.order] }),
-    db.query.scenarios.findMany(),
+    db.query.scenarios.findMany({ where: eq(schema.scenarios.active, true) }),
   ]);
   const trackComp = new Map(tracks.map((t) => [t.id, t.competency]));
   const lessonsFor = (c: Competency) => lessons.filter((l) => trackComp.get(l.trackId) === c);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { competencyMeans, normalizeToLevel, streakDays, targetLevelFor } from "./progress";
+import { competencyMeans, normalizeToLevel, streakDays, targetLevelFor, ukDayKey, ukWeekStartKey } from "./progress";
 
 describe("progress helpers", () => {
   it("normalizes rubric scores to the user's target level", () => {
@@ -30,5 +30,17 @@ describe("progress helpers", () => {
     expect(streakDays([d("2026-09-24"), d("2026-09-23"), d("2026-09-22")], today)).toBe(3);
     expect(streakDays([d("2026-09-23"), d("2026-09-22")], today)).toBe(2);
     expect(streakDays([d("2026-09-21")], today)).toBe(0);
+  });
+
+  it("uses UK days, so a rep just after midnight BST counts for the new day", () => {
+    // 23:30 UTC on 3 Oct is 00:30 BST on 4 Oct.
+    expect(ukDayKey(new Date("2026-10-03T23:30:00Z"))).toBe("2026-10-04");
+    expect(ukDayKey(new Date("2026-12-03T23:30:00Z"))).toBe("2026-12-03"); // GMT in winter
+    expect(streakDays([new Date("2026-10-03T23:30:00Z")], new Date("2026-10-04T10:00:00Z"))).toBe(1);
+  });
+
+  it("starts UK weeks on Monday", () => {
+    expect(ukWeekStartKey(new Date("2026-10-04T10:00:00Z"))).toBe("2026-09-28"); // Sunday → previous Monday
+    expect(ukWeekStartKey(new Date("2026-10-05T00:30:00+01:00"))).toBe("2026-10-05");
   });
 });

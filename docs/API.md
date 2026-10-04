@@ -68,7 +68,7 @@ Shared types (`Level`, `Competency`, `Mood`, `PyramidNode`, `GhostSlide`, `Studi
 
 ## Practice hub (spec §5.5)
 
-- **GET `/scenarios?kind=simulation|storyboard&competency=…&level=…`** returns `{ scenarios: [{ id, kind, title, summary, personaId, targetLevel, difficulty (1–3), durationMin, competencies, isPro, bestScore, attempted }] }`.
+- **GET `/scenarios?kind=simulation|storyboard&competency=…&level=…`** returns `{ scenarios: [{ id, kind, title, summary, personaId, targetLevel, difficulty (1–3), durationMin, competencies, practiceArea, isPro, bestScore, attempted }] }`. `practiceArea` is one of `enterprise_technology | data_ai | programme_delivery | change_culture | commercial_advisory`. Retired scenarios are excluded.
 - **GET `/scenarios/:id`** (for the briefing drawer) returns `{ scenario: { …, briefing: { situation, yourRole, objective, whatGoodLooksLike: Record<Level,string> }, objectives: [{ id, label }], maxTurns }, persona, rubric: { criteria: [{ id, label, competency, description }] } }`.
 - **GET `/personas`** returns `{ personas: [{ id, name, title, company, personality, avatarKey }] }`.
 
@@ -148,4 +148,4 @@ The `storyboard` object has this shape: `{ id, stage: "pyramid"|"ghost_deck"|"re
 
 ## Health
 
-**GET `/health`** returns `{ ok, db: "up"|"down", ai: "mock"|"live" }`.
+**GET `/health`** returns `{ ok, db: "up"|"down", ai: "live"|"mock"|"off" }`. `off` means production without an API key: AI endpoints return `503 ai_misconfigured`.

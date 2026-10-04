@@ -10,6 +10,7 @@ const LIMITS = {
   evaluate: { max: 20, windowMs: 60 * 60_000 }, // feedback reports, studio submit
   review: { max: 30, windowMs: 60 * 60_000 }, // studio "ask for review", red pen
   login: { max: 20, windowMs: 15 * 60_000 }, // sign-in attempts per IP
+  signup: { max: 10, windowMs: 60 * 60_000 }, // new accounts per IP
 } as const;
 
 export type LimitKind = keyof typeof LIMITS;

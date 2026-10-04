@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BookOpen, Check, Clock, Flame, Minus, Play, Target, TriangleAlert } from "lucide-react";
 import { requirePageUser } from "@/lib/page-auth";
+import { PRACTICE_AREA_LABELS } from "@/lib/practice-areas";
 import { getDashboard } from "@/lib/services/progress";
 import { COMPETENCY_LABELS, LEVEL_BAR, LEVEL_LABELS, type Verdict } from "@/lib/competency";
 import { Card, CardTitle, Eyebrow } from "@/components/ui/card";
@@ -33,6 +34,7 @@ export default async function HomePage() {
             <Eyebrow className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-accent" />
               Today&apos;s rep
+              {d.todaysRep.scenario.practiceArea && <span className="text-primary">· {PRACTICE_AREA_LABELS[d.todaysRep.scenario.practiceArea]}</span>}
             </Eyebrow>
             <div className="flex flex-col gap-1.5">
               <h2 id="rep-title" className="m-0 font-serif text-[28px] leading-tight font-semibold tracking-tight md:text-[32px]">

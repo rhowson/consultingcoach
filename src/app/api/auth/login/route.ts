@@ -4,13 +4,10 @@ import { db, schema } from "@/db";
 import { createSession, publicUser, verifyPassword } from "@/lib/auth";
 import { HttpError, json, parseBody, route } from "@/lib/api/http";
 import { checkRateLimit } from "@/lib/api/rate-limit";
+import { clientIp } from "@/lib/api/client-ip";
 import { afterFailure, lockRemainingMs, lockoutMessage } from "@/lib/login-guard";
 
 const Body = z.object({ email: z.string().transform((s) => s.toLowerCase().trim()), password: z.string() });
-
-function clientIp(req: Request) {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
-}
 
 export const POST = route(async (req) => {
   // Per-IP cap first, so guessing across many emails is throttled too.

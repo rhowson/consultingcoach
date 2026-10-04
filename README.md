@@ -42,7 +42,7 @@ npm run db:seed                 # content + demo user priya@demo.consultingcoach
 npm run dev
 ```
 
-Without `ANTHROPIC_API_KEY` the AI engine runs in **mock mode**: scripted persona replies and heuristic scores. Every flow works end to end, so front-end work doesn't need a key. `GET /api/health` reports `"ai": "mock"` or `"live"`.
+Without `ANTHROPIC_API_KEY` (in development) or with `AI_MOCK=1`, the AI engine runs in **practice/mock mode**: scripted persona replies and heuristic scores. Every flow works end to end, so front-end work doesn't need a key. `GET /api/health` reports `"ai": "mock"` or `"live"`.
 
 ## Scripts
 
@@ -54,6 +54,20 @@ Without `ANTHROPIC_API_KEY` the AI engine runs in **mock mode**: scripted person
 | `npm run typecheck` / `npm run lint` | Static checks |
 | `npm run db:generate` | Create a migration after editing `src/db/schema.ts` |
 | `npm run db:migrate` / `npm run db:seed` | Apply migrations / upsert content |
+
+## Scenario catalogue
+
+Scenarios are UK technology and transformation engagements, priced in £, tagged with a practice area (`src/lib/practice-areas.ts`) and seeded from `src/content/`:
+
+| Practice area | Client Simulator | Storyboard Studio |
+| --- | --- | --- |
+| Enterprise technology | The cloud bill shock (CIO, Manager) | – |
+| Data & AI | The pilot isn't ready (CDO, Consultant); That's all you're getting (Head of MI, Analyst) | Meridian Insurance: why hasn't the £14m data platform delivered? (Consultant) |
+| Programme delivery | Green on the outside (Programme Director, Manager); While you're here… (Director of Digital, Consultant) | – |
+| Change & culture | The leaked operating model (Director of Housing Operations, Manager) | – |
+| Commercial advisory & decision support | Your benefits case is wrong (CFO, Consultant); The 10-minute CEO (Chief Executive, Director) | Calder Water: renew, re-tender or insource IT services? (Manager) |
+
+Retired scenarios (`retiredScenarioIds`) stay in the database so old reports still work, but are hidden from the catalogue.
 
 ## How the coaching engine works
 
@@ -95,14 +109,14 @@ The live app runs in the Railway project `consultingcoach` (service `app` + `Pos
 | Pre-deploy command | `npm run db:migrate && npm run db:seed` (idempotent) |
 | Start command | `npm run start` |
 | Health check | `/api/health` (fails if the database has no tables) |
-| Variables | `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`, `AUTH_SECRET`, `NODE_ENV=production`, `DEMO_PASSWORD` (demo account password), `ANTHROPIC_API_KEY` |
+| Variables | `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`, `AUTH_SECRET`, `NODE_ENV=production`, `DEMO_PASSWORD` (demo account password), `ANTHROPIC_API_KEY` (required: without it AI features are off in production, never simulated), optional `SIGNUP_ACCESS_CODE` (invite-only sign-up), optional `AI_MODEL` |
 
 Deploy-on-push needs the Railway GitHub App installed on the repository.
 
 ## Not built yet
 
 - SteerCo Rehearsal questions are scripted client-side and not scored yet
-- Pro plan / billing (Pro scenarios always show as locked)
+- Pro plan / billing
 - File parsing for Red Pen uploads (the API takes plain text for now)
 - Voice mode and the B2B team dashboard
 - Rate limiting on AI endpoints

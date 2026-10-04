@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { ZodError, type ZodType } from "zod";
 import { getCurrentUser, type User } from "@/lib/auth";
-import { AiRefusalError } from "@/lib/ai/client";
+import { AiRefusalError, AiUnavailableError } from "@/lib/ai/client";
 
 export class HttpError extends Error {
   constructor(
@@ -55,6 +55,12 @@ export function route<C = unknown>(handler: Handler<C>): Handler<C> {
         return NextResponse.json(
           { error: { code: "validation_error", message: "Invalid request", issues: err.issues } },
           { status: 422 },
+        );
+      }
+      if (err instanceof AiUnavailableError) {
+        return NextResponse.json(
+          { error: { code: "ai_misconfigured", message: "The AI coach isn't available yet — an administrator needs to finish setting it up." } },
+          { status: 503 },
         );
       }
       if (err instanceof AiRefusalError) {

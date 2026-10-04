@@ -35,6 +35,16 @@ export const rubrics: Rubric[] = [
     ],
   },
   {
+    id: "business-development",
+    name: "Business development",
+    criteria: [
+      { id: "discovery", label: "Discovery & listening", competency: "client_management", description: "Asks about the client's situation, stakes and decision process before proposing; talks less than the client." },
+      { id: "value", label: "Value framing", competency: "problem_solving", description: "Connects the proposal to a specific, quantified client problem or priority, not to the firm's capabilities." },
+      { id: "commercial", label: "Commercial judgement", competency: "client_management", description: "Holds the value of the work; trades scope, timing or terms rather than conceding on price." },
+      { id: "advance", label: "Advancing the opportunity", competency: "client_management", description: "Leaves with a concrete next step that moves the sale forward: a meeting with the decision-maker, a scoped proposal or a decision date." },
+    ],
+  },
+  {
     id: "storyboard",
     name: "Storyline & ghost deck",
     criteria: [
@@ -299,6 +309,99 @@ export const scenarios: Scenario[] = [
     ],
     openingLine: "I've got ten minutes. You want me to spend eighteen million on software. Why?",
     maxTurns: 8,
+  },
+
+  // ---------- Business development ----------
+  {
+    id: "first-meeting-cio",
+    kind: "simulation",
+    practiceArea: "commercial_advisory",
+    title: "First meeting with a new CIO",
+    summary: "A new CIO gave you 30 minutes as a favour to a mutual contact. Find a real need without pitching.",
+    personaId: "helen-marsh",
+    rubricId: "business-development",
+    targetLevel: "manager",
+    difficulty: 2,
+    durationMin: 15,
+    competencies: ["client_management", "problem_solving"],
+    briefing: {
+      situation:
+        "Helen Marsh joined Fenwick & Hale, a UK homeware retailer with 140 stores, as CIO four months ago. Your firm has never worked there. A former colleague of hers introduced you. You know the retailer is exiting its data centre and that online sales have fallen two years running.",
+      yourRole: "Senior manager in your firm's technology strategy practice, building a client base in retail.",
+      objective: "Understand Helen's priorities and what's at stake, earn the right to a second meeting, and avoid pitching before you understand the need.",
+      whatGoodLooksLike: {
+        consultant: "Asks good open questions, listens and summarises what Helen said before talking about the firm.",
+        manager: "Finds the specific problem and what's at stake in £ and time, shares one relevant insight and agrees a follow-up on that problem.",
+        director: "Also maps who else decides, gives a point of view that changes her thinking, and secures a meeting with her and the CFO.",
+      },
+    },
+    objectives: [
+      { id: "discover", label: "Found her real priority" },
+      { id: "stakes", label: "Established what's at stake" },
+      { id: "next", label: "Agreed a specific follow-up" },
+    ],
+    openingLine: "Thanks for coming in. I'll be honest — I said yes to this as a favour to Tom. I've had six consultancies through the door this month and they all opened with a capabilities deck. What have you got?",
+    maxTurns: 10,
+  },
+  {
+    id: "fee-pushback",
+    kind: "simulation",
+    practiceArea: "commercial_advisory",
+    title: "Procurement wants 20% off",
+    summary: "You've been shortlisted for a £640k CRM implementation. Procurement says you're the most expensive and wants 20% off by Friday.",
+    personaId: "neil-forsyth",
+    rubricId: "business-development",
+    targetLevel: "director",
+    difficulty: 3,
+    durationMin: 15,
+    competencies: ["client_management", "difficult_conversations"],
+    briefing: {
+      situation:
+        "Pennine Mutual, a UK insurer, is replacing its member CRM before its contract renewal in 11 months; extending the old system would cost £1.1m. Your proposal is £640k over 20 weeks, fixed price. Two competitors bid £520k and £560k on time-and-materials. The COO prefers your approach because of your phone-first migration plan.",
+      yourRole: "Client director accountable for the bid and its margin.",
+      objective: "Keep the value of the work, avoid an unconditional discount, and agree a path to contract.",
+      whatGoodLooksLike: {
+        manager: "Stays calm, explains what the fee includes and avoids conceding on the spot.",
+        director: "Explores what's driving the request, compares fixed price with competitors' time-and-materials risk, offers trades (phasing, payment terms, scope) instead of a rate cut and agrees a next step involving the COO.",
+      },
+    },
+    objectives: [
+      { id: "explore", label: "Explored what's driving the request" },
+      { id: "value", label: "Reconnected the fee to value and risk" },
+      { id: "trade", label: "Offered a trade, not a discount" },
+    ],
+    openingLine: "Right. You're £80k more than the next bidder and £120k more than the cheapest. I need 20% off by Friday or I'll be recommending we go elsewhere.",
+    maxTurns: 10,
+  },
+  {
+    id: "extend-the-engagement",
+    kind: "simulation",
+    practiceArea: "data_ai",
+    title: "Earn the follow-on",
+    summary: "Your data platform review lands well. Now turn what you've learned into a follow-on the COO wants to buy, without sounding like a sales pitch.",
+    personaId: "owen-price",
+    rubricId: "business-development",
+    targetLevel: "director",
+    difficulty: 2,
+    durationMin: 15,
+    competencies: ["client_management", "problem_solving"],
+    briefing: {
+      situation:
+        "Your eight-week review of Harbour Homes' repairs data finishes next week. The team found that 30% of repair jobs need a second visit because the first visit lacks the right part, costing about £2.4m a year, and tenant complaints are rising. The COO, Owen Price, liked the review, but his budget is under pressure and the board is wary of 'consultants who never leave'.",
+      yourRole: "Client director for Harbour Homes.",
+      objective: "Position a focused follow-on around the repeat-visit problem, with clear value and a decision path, while keeping Owen's trust.",
+      whatGoodLooksLike: {
+        manager: "Summarises the findings and suggests a sensible next phase.",
+        director: "Leads with Owen's problem and the £ at stake, proposes a small, outcome-based next step with a way out, addresses the 'consultants who never leave' concern head on and agrees how it goes to the board.",
+      },
+    },
+    objectives: [
+      { id: "problem", label: "Led with his problem, not the next phase" },
+      { id: "value", label: "Quantified the value of acting" },
+      { id: "path", label: "Agreed a decision path" },
+    ],
+    openingLine: "Good work on the review — the board liked it. But I'll warn you now: if this is the bit where you tell me I need another six months of your team, you'll get a short answer.",
+    maxTurns: 10,
   },
 
   // ---------- Storyboard cases ----------

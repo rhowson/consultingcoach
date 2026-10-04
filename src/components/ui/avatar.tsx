@@ -9,6 +9,9 @@ const PERSONA_BG: Record<string, string> = {
   "mark-bennett": "#335C67",
   "gareth-lloyd": "#4A5D23",
   "rachel-doyle": "#8A5A2B",
+  "helen-marsh": "#2E5E4E",
+  "neil-forsyth": "#5A4A7A",
+  "owen-price": "#6B5B3A",
 };
 
 export function initials(name: string) {

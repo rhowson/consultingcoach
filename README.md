@@ -68,6 +68,9 @@ Scenarios are UK technology and transformation engagements, priced in £, tagged
 | Programme delivery | Green on the outside (Programme Director, Manager); While you're here… (Director of Digital, Consultant) | – |
 | Change & culture | The leaked operating model (Director of Housing Operations, Manager) | – |
 | Commercial advisory & decision support | Your benefits case is wrong (CFO, Consultant); The 10-minute CEO (Chief Executive, Director) | Calder Water: renew, re-tender or insource IT services? (Manager) |
+| Business development | First meeting with a new CIO (Manager); Procurement wants 20% off (Head of Procurement, Director); Earn the follow-on (COO, Director) | – |
+
+Learn has a separate **Client leadership & business development** group for client directors and people who sell services, with four tracks: Account Leadership, Winning Work, Commercial Conversations and Trusted Advisor (`BUSINESS_DEVELOPMENT_TRACK_IDS` in `src/lib/learn-groups.ts`). Business development scenarios use their own rubric: discovery, value framing, commercial judgement and advancing the opportunity.
 
 Retired scenarios (`retiredScenarioIds`) stay in the database so old reports still work, but are hidden from the catalogue.
 

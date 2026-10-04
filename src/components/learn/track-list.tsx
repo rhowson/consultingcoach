@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { BookOpen, Check, ChevronRight, Clock } from "lucide-react";
+import { BookOpen, Briefcase, Check, ChevronRight, Clock, GraduationCap } from "lucide-react";
+import { BUSINESS_DEVELOPMENT_TRACK_IDS } from "@/lib/learn-groups";
 import { COMPETENCIES, COMPETENCY_LABELS, LEVEL_LABELS, type Competency, type Level } from "@/lib/competency";
 import { Card } from "@/components/ui/card";
 import { CompetencyChip } from "@/components/ui/badges";
@@ -26,10 +27,30 @@ export interface TrackData {
   lessons: TrackLesson[];
 }
 
+type Filter = Competency | "all" | "bd";
+
+const GROUPS = [
+  {
+    id: "core",
+    title: "Core consulting skills",
+    description: "Problem solving, storylining, outputs and client conversations, from Analyst up.",
+    Icon: GraduationCap,
+    match: (t: TrackData) => !BUSINESS_DEVELOPMENT_TRACK_IDS.includes(t.id),
+  },
+  {
+    id: "bd",
+    title: "Client leadership & business development",
+    description: "For client directors and anyone who sells services: grow accounts, win work and hold the fee.",
+    Icon: Briefcase,
+    match: (t: TrackData) => BUSINESS_DEVELOPMENT_TRACK_IDS.includes(t.id),
+  },
+] as const;
+
 export function TrackList({ tracks }: { tracks: TrackData[] }) {
-  const [filter, setFilter] = useState<Competency | "all">("all");
+  const [filter, setFilter] = useState<Filter>("all");
   const present = COMPETENCIES.filter((c) => tracks.some((t) => t.competency === c));
-  const shown = filter === "all" ? tracks : tracks.filter((t) => t.competency === filter);
+  const shown = filter === "all" ? tracks : filter === "bd" ? tracks.filter(GROUPS[1].match) : tracks.filter((t) => t.competency === filter);
+  const hasBd = tracks.some(GROUPS[1].match);
 
   if (tracks.length === 0) {
     return (
@@ -45,6 +66,12 @@ export function TrackList({ tracks }: { tracks: TrackData[] }) {
         <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
           All tracks
         </FilterChip>
+        {hasBd && (
+          <FilterChip active={filter === "bd"} onClick={() => setFilter("bd")}>
+            <Briefcase size={14} aria-hidden />
+            Business development
+          </FilterChip>
+        )}
         {present.map((c) => (
           <FilterChip key={c} active={filter === c} onClick={() => setFilter(c)}>
             <CompetencyIcon competency={c} size={14} />
@@ -53,11 +80,30 @@ export function TrackList({ tracks }: { tracks: TrackData[] }) {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        {shown.map((t) => (
-          <TrackCard key={t.id} track={t} />
-        ))}
-      </div>
+      {GROUPS.map((g) => {
+        const items = shown.filter(g.match);
+        if (!items.length) return null;
+        return (
+          <section key={g.id} aria-labelledby={`group-${g.id}`} className="flex flex-col gap-4">
+            <div className="flex items-start gap-3 pt-2">
+              <span className="flex h-10 w-10 flex-none items-center justify-center rounded-md bg-primary-tint text-primary">
+                <g.Icon size={20} aria-hidden />
+              </span>
+              <div className="flex flex-col">
+                <h2 id={`group-${g.id}`} className="m-0 font-display text-xl font-semibold tracking-tight">
+                  {g.title}
+                </h2>
+                <p className="m-0 text-sm text-muted">{g.description}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              {items.map((t) => (
+                <TrackCard key={t.id} track={t} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }
@@ -85,9 +131,9 @@ function TrackCard({ track: t }: { track: TrackData }) {
       <div className="flex items-start gap-4">
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <CompetencyChip competency={t.competency} />
-          <h2 id={`track-${t.id}`} className="m-0 font-serif text-xl leading-snug font-semibold">
+          <h3 id={`track-${t.id}`} className="m-0 font-serif text-xl leading-snug font-semibold">
             {t.title}
-          </h2>
+          </h3>
         </div>
         <ProgressRing value={pct} label={`${t.completedCount} of ${t.lessonCount} lessons complete`} />
       </div>

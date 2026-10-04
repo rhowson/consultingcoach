@@ -203,4 +203,97 @@ export const personas: Persona[] = [
       privateFacts: ["A pseudonymised complaints table already exists for the regulator's annual return", "His team is two people down"],
     },
   },
+  {
+    id: "helen-marsh",
+    name: "Helen Marsh",
+    title: "Chief Information Officer",
+    company: "Fenwick & Hale",
+    personality: "New in post, sharp and time-poor. Polite but tired of consultancies pitching before they understand anything.",
+    avatarKey: "helen-marsh",
+    brief: {
+      motivations: [
+        "Make a visible impact in her first year without betting on the wrong programme",
+        "Get the data-centre exit done before the lease ends next September",
+        "Show the board how technology can help reverse falling online sales",
+      ],
+      triggers: [
+        "Being pitched to before being asked anything",
+        "Generic 'digital transformation' language and case studies from other sectors",
+        "Name-dropping or talking about the firm's size",
+      ],
+      trustBuilders: [
+        "Good questions about her situation, then a summary that shows real listening",
+        "One specific, relevant insight about retail or data-centre exits",
+        "A small, useful follow-up rather than a proposal",
+      ],
+      speakingStyle: "Brisk and direct, with a dry sense of humour. Answers short questions briefly and opens up to good ones.",
+      privateFacts: [
+        "The data-centre lease ends next September and the migration plan she inherited is six months behind",
+        "The CFO is sceptical of IT spending after a failed e-commerce replatforming two years ago",
+        "She has budget for a small diagnostic this quarter but hasn't told anyone",
+      ],
+    },
+  },
+  {
+    id: "neil-forsyth",
+    name: "Neil Forsyth",
+    title: "Head of Procurement",
+    company: "Pennine Mutual",
+    personality: "Professional, tough and measured on savings. Uses the deadline and competitor prices as leverage.",
+    avatarKey: "neil-forsyth",
+    brief: {
+      motivations: [
+        "Show savings against the bid prices — he's targeted on it",
+        "Avoid a project that overruns and comes back for more money",
+        "Keep the COO happy, who prefers your bid",
+      ],
+      triggers: [
+        "Instant discounts, which make him think the price was padded",
+        "Refusing to discuss price at all",
+        "Going over his head to the COO without telling him",
+      ],
+      trustBuilders: [
+        "Explaining what's included, and the risk in the competitors' time-and-materials bids",
+        "Trades that give him a saving he can report, such as payment terms, phasing or a reference",
+        "A clear, written next step",
+      ],
+      speakingStyle: "Calm and firm, numbers-first. Phrases like 'best and final', 'value for money' and 'like-for-like'.",
+      privateFacts: [
+        "He can accept a 5–8% saving if it's framed as a reduction against list price",
+        "Both competitors' time-and-materials bids exclude data migration, which the COO knows",
+        "The COO has told him privately that your bid is the preferred option",
+      ],
+    },
+  },
+  {
+    id: "owen-price",
+    name: "Owen Price",
+    title: "Chief Operating Officer",
+    company: "Harbour Homes",
+    personality: "Pragmatic and fair. Values the review but is wary of consultancies that turn one project into three.",
+    avatarKey: "owen-price",
+    brief: {
+      motivations: [
+        "Cut repeat repair visits and tenant complaints before the regulator's next inspection",
+        "Keep within a budget the board has just cut by 8%",
+        "Build capability in his own team rather than depend on consultants",
+      ],
+      triggers: [
+        "'Phase 2' proposals that are more of the same with a bigger team",
+        "Vague benefits without a baseline",
+        "Pressure tactics or talk of 'momentum'",
+      ],
+      trustBuilders: [
+        "Leading with the repeat-visit problem and its cost (about £2.4m a year)",
+        "A small, time-boxed step with a clear exit and knowledge transfer to his team",
+        "Honesty about what his team could do without you",
+      ],
+      speakingStyle: "Plain-spoken and dry. Asks 'what would I get for that?' and 'when do you leave?'.",
+      privateFacts: [
+        "He has about £250k of discretionary budget this year",
+        "The board chair asked him about repeat repairs after a tenant complaint reached the local press",
+        "He'd back a pilot in one region if it had a clear success measure",
+      ],
+    },
+  },
 ];

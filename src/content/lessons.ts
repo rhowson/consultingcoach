@@ -12,7 +12,13 @@ export const tracks: Track[] = [
   { id: "managing-scope", title: "Managing Scope", description: "Options, not refusals.", competency: "client_management", order: 6 },
   { id: "running-a-steerco", title: "Running a SteerCo", description: "Honest status and decisions, not just nods.", competency: "client_management", order: 7 },
   { id: "executive-presence", title: "Executive Presence", description: "Brevity, calm and command of the room.", competency: "client_management", order: 8 },
+  // ---------- Client leadership & business development (Manager → Director) ----------
+  { id: "account-leadership", title: "Account Leadership", description: "Own the relationship, map the buying centre and grow the account on merit.", competency: "client_management", order: 9 },
+  { id: "winning-work", title: "Winning Work", description: "Qualify hard, shape the need and write proposals that answer the client's question.", competency: "client_management", order: 10 },
+  { id: "commercial-conversations", title: "Commercial Conversations", description: "Price on value, defend the fee and trade, never just concede.", competency: "client_management", order: 11 },
+  { id: "trusted-advisor", title: "Trusted Advisor", description: "Earn the next conversation with C-suite clients through insight, not activity.", competency: "client_management", order: 12 },
 ];
+
 
 export const lessons: Lesson[] = [
   {
@@ -201,6 +207,228 @@ export const lessons: Lesson[] = [
         bad: "We assessed three architecture options against fourteen criteria including interoperability, scalability and vendor roadmap.",
         good: "I'm asking you to take a phased SaaS move to the board next month: £18m over five years, about £5m a year back from 2028, and it removes the outage risk the CQC asked about.",
         annotation: "Methodology can wait for the appendix.",
+      },
+    ],
+  },
+  // ---------- Account leadership ----------
+  {
+    id: "map-the-buying-centre",
+    trackId: "account-leadership",
+    title: "Map the buying centre",
+    level: "manager",
+    durationMin: 7,
+    order: 1,
+    practiceScenarioId: "extend-the-engagement",
+    blocks: [
+      { type: "text", markdown: "Technology and transformation work is rarely bought by one person. Before you sell anything, map the **buying centre**: who signs, who influences, who blocks and who uses what you deliver. Most lost follow-ons were lost to someone the team never met." },
+      { type: "key_idea", markdown: "For each stakeholder, know three things: **what they're measured on**, **what they think of us**, and **who on our side owns the relationship**. A blank in any column is a risk." },
+      {
+        type: "example_pair",
+        bad: "Our sponsor is the CIO and she's very happy, so the phase 2 extension should be straightforward.",
+        good: "The CIO sponsors us, but the CFO signs anything over £500k and Procurement wants a competitive tender. Our partner meets the CFO next week; I'll take the Head of Procurement through our value evidence before then.",
+        annotation: "One happy sponsor isn't an account plan. The second names the signer, the blocker and who covers each.",
+      },
+      {
+        type: "quiz",
+        question: "Your sponsor loves the work, but the follow-on needs CFO approval and you've never met the CFO. What's the best next step?",
+        options: [
+          "Ask the sponsor to forward the proposal to the CFO",
+          "Ask the sponsor for an introduction and prepare a CFO-level view of value delivered so far",
+          "Wait for the CFO to ask for a meeting",
+        ],
+        answerIndex: 1,
+        explanation: "Get in front of the signer with what they care about (value in £, risk), and let your sponsor be your champion rather than your courier.",
+      },
+    ],
+  },
+  {
+    id: "delivery-to-account-plan",
+    trackId: "account-leadership",
+    title: "From delivery to account plan",
+    level: "director",
+    durationMin: 8,
+    order: 2,
+    practiceScenarioId: "extend-the-engagement",
+    blocks: [
+      { type: "text", markdown: "The best source of new work is the work you're doing now. A one-page **account plan** turns delivery insight into growth: the client's top three priorities, where we've proven value, the gaps we've seen, the relationships we need, and the next two conversations to have." },
+      { type: "key_idea", markdown: "Sell the **next problem**, not the next phase. 'Phase 2' sounds like more of the same; 'the data ownership gap that's blocking £4m of value' sounds like a reason to act." },
+      {
+        type: "example_pair",
+        bad: "We'd love to discuss extending the team into phase 2 — we've built a great relationship and know the systems well.",
+        good: "Three of your five use cases are blocked by claims data with no owner. We've seen it first-hand. A six-week data ownership sprint would unblock about £4m a year — shall I set out how?",
+        annotation: "The first is about us. The second is about their problem, uses evidence only the delivery team has, and asks a small question.",
+      },
+      {
+        type: "quiz",
+        question: "Which is the strongest basis for proposing follow-on work?",
+        options: [
+          "The team is already on site, so it's cheaper to continue",
+          "A specific problem we've seen in delivery, quantified, linked to a priority the client has",
+          "Our firm's wider capabilities in the area",
+        ],
+        answerIndex: 1,
+        explanation: "Continuity is a nice-to-have. A quantified problem tied to their priorities is a reason to buy.",
+      },
+    ],
+  },
+  // ---------- Winning work ----------
+  {
+    id: "qualify-before-you-chase",
+    trackId: "winning-work",
+    title: "Qualify before you chase",
+    level: "manager",
+    durationMin: 6,
+    order: 1,
+    practiceScenarioId: "first-meeting-cio",
+    blocks: [
+      { type: "text", markdown: "Bids are expensive, and losing one you should never have chased costs more than the bid. Qualify every opportunity on four questions: **Is there a real, funded need? Can we win? Can we deliver? Is it worth winning?** If you can't answer 'yes' with evidence, find out or walk away." },
+      { type: "key_idea", markdown: "\"Can we win?\" is mostly about **who we know and what they think of us** before the tender lands. If the first you heard of it was the RFP, someone else probably shaped it." },
+      {
+        type: "quiz",
+        question: "An RFP for a £2m ERP assessment arrives unexpectedly from a council you've never worked with. The deadline is in 10 days. What's the most important question?",
+        options: [
+          "Do we have ERP credentials?",
+          "Who shaped this requirement, and do we have any relationship with the buyer?",
+          "Can we price below the budget?",
+        ],
+        answerIndex: 1,
+        explanation: "An unexpected RFP is often written around a competitor. Without a relationship or insight into the real need, your win probability is low however strong the credentials.",
+      },
+    ],
+  },
+  {
+    id: "discovery-not-pitch",
+    trackId: "winning-work",
+    title: "Discovery, not pitch",
+    level: "manager",
+    durationMin: 7,
+    order: 2,
+    practiceScenarioId: "first-meeting-cio",
+    blocks: [
+      { type: "text", markdown: "In a first meeting, the person asking the best questions wins, not the one with the best slides. Spend at least two-thirds of the time on the client: their situation, what's at stake, what they've tried, and how they'll decide." },
+      { type: "key_idea", markdown: "Use **situation → impact → implication** questions. 'What happens if the migration slips past March?' teaches you more, and makes the need more urgent to them, than any capability slide." },
+      {
+        type: "example_pair",
+        bad: "Let me walk you through our cloud migration methodology and some recent case studies.",
+        good: "Before I say anything about us — you mentioned the board is nervous about the data-centre exit. What's driving the March date, and what happens if it slips?",
+        annotation: "The first pitches before understanding. The second earns the right to propose by finding what's at stake.",
+      },
+    ],
+  },
+  {
+    id: "proposals-answer-the-question",
+    trackId: "winning-work",
+    title: "Proposals that answer the question",
+    level: "director",
+    durationMin: 8,
+    order: 3,
+    practiceScenarioId: null,
+    blocks: [
+      { type: "text", markdown: "Most proposals open with the firm, the methodology and the team. The client reads the first page and the price. Put **your understanding of their problem, the outcome you'll deliver and why you** on page one, in their words." },
+      { type: "key_idea", markdown: "Write the executive summary as a pyramid: the outcome you'll deliver, then three reasons to choose you that a competitor couldn't credibly claim." },
+      {
+        type: "example_pair",
+        bad: "Founded in 1998, our firm is a leading provider of digital transformation services with over 2,000 consultants worldwide.",
+        good: "You need the new CRM live before renewal season without losing the 14% of members who renew by phone. We'll get you there in 20 weeks, with a phone-first migration we've run for two other UK mutuals.",
+        annotation: "The client should recognise their own problem in your first sentence.",
+      },
+      {
+        type: "quiz",
+        question: "What should the first page of a proposal do?",
+        options: [
+          "Introduce the firm and its credentials",
+          "Restate the client's problem and the outcome, and say why you're best placed",
+          "Set out the detailed workplan",
+        ],
+        answerIndex: 1,
+        explanation: "Credentials and workplans support the answer; they aren't the answer.",
+      },
+    ],
+  },
+  // ---------- Commercial conversations ----------
+  {
+    id: "defend-value-not-rate",
+    trackId: "commercial-conversations",
+    title: "Defend value, not the rate",
+    level: "director",
+    durationMin: 7,
+    order: 1,
+    practiceScenarioId: "fee-pushback",
+    blocks: [
+      { type: "text", markdown: "When a client says 'you're too expensive', they usually mean 'I can't yet justify this to someone else'. Don't defend your day rate; **reconnect the fee to the outcome** and help them make the case internally." },
+      { type: "key_idea", markdown: "Never give something for nothing. If you move on price, **trade**: scope, timing, payment terms, a reference or a commitment to phase 2." },
+      {
+        type: "example_pair",
+        bad: "I understand. We could probably bring the fee down by 15% if that helps.",
+        good: "I understand the budget pressure. The £640k gets you live before the contract renewal, which avoids the £1.1m extension. If we need to reduce the fee, we could phase the data migration into Q3. What matters most to you: the date or the full scope?",
+        annotation: "The first concedes instantly and signals the price was padded. The second ties the fee to value and offers a trade.",
+      },
+      {
+        type: "quiz",
+        question: "Procurement asks for a 20% discount 'as standard'. What's the best response?",
+        options: [
+          "Agree to 10% as a compromise",
+          "Ask what's driving it, restate the value, and offer options that change scope or terms rather than the rate",
+          "Refuse any discussion of price",
+        ],
+        answerIndex: 1,
+        explanation: "Explore first, then trade. An unexplained discount teaches the client your prices are negotiable by default.",
+      },
+    ],
+  },
+  {
+    id: "price-the-outcome",
+    trackId: "commercial-conversations",
+    title: "Price the outcome, share the risk",
+    level: "director",
+    durationMin: 6,
+    order: 2,
+    practiceScenarioId: "fee-pushback",
+    blocks: [
+      { type: "text", markdown: "Time-and-materials is easy to buy and easy to cut. For work with a measurable outcome, consider **fixed price for defined scope** or a **gain-share** element. It shows confidence and moves the conversation from cost to value — but only take risk you can control." },
+      { type: "key_idea", markdown: "Before offering a risk-share, check three things: can the outcome be measured, can we influence it, and is the baseline agreed in writing?" },
+    ],
+  },
+  // ---------- Trusted advisor ----------
+  {
+    id: "earn-the-next-conversation",
+    trackId: "trusted-advisor",
+    title: "Earn the next conversation",
+    level: "director",
+    durationMin: 7,
+    order: 1,
+    practiceScenarioId: "first-meeting-cio",
+    blocks: [
+      { type: "text", markdown: "C-suite clients take meetings that make them smarter. Bring a **point of view**: one insight about their business, sector or peers that they didn't have. Then leave a reason to meet again, not a brochure." },
+      { type: "key_idea", markdown: "Trust = (credibility + reliability + intimacy) ÷ self-orientation. The fastest way to lose trust is to make the meeting about your sale." },
+      {
+        type: "example_pair",
+        bad: "Thanks for your time. I'll send over our capability deck and some case studies.",
+        good: "Three of the building societies we work with have cut cloud run costs by a fifth by sorting rightsizing before the data-centre exit. I'll send you the one-page comparison, and could we pick up the board question in a fortnight?",
+        annotation: "Insight, a specific follow-up and a reason to meet again.",
+      },
+    ],
+  },
+  {
+    id: "say-no-to-grow",
+    trackId: "trusted-advisor",
+    title: "Say no to grow",
+    level: "director",
+    durationMin: 5,
+    order: 2,
+    practiceScenarioId: null,
+    blocks: [
+      { type: "text", markdown: "Recommending against work your firm could sell is the most powerful trust-building move you have. Clients remember the adviser who said 'you don't need us for that'." },
+      {
+        type: "quiz",
+        question: "A client asks you to run a large AI strategy programme, but their data isn't ready and a smaller fix would deliver more. What builds the most long-term value?",
+        options: [
+          "Sell the programme — they asked for it",
+          "Recommend the smaller data fix first, and say why the strategy work should wait",
+          "Propose both together to maximise the fee",
+        ],
+        answerIndex: 1,
+        explanation: "You lose some fee today and earn the next five conversations.",
       },
     ],
   },

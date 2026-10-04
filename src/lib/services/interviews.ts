@@ -239,7 +239,11 @@ export async function candidateView(token: string) {
     })),
     assistantLog: evs
       .filter((e) => e.sectionId === "s2" && (e.type === "assistant_prompt" || e.type === "assistant_reply" || e.type === "guardrail_block"))
-      .map((e) => ({ role: e.type === "assistant_prompt" ? "candidate" : "assistant", content: e.type === "guardrail_block" ? String(e.meta?.refusal ?? "") : e.content ?? "" })),
+      .map((e) => ({
+        role: e.type === "assistant_prompt" ? "candidate" : "assistant",
+        content: e.type === "guardrail_block" ? String(e.meta?.refusal ?? "") : e.content ?? "",
+        blocked: e.type === "guardrail_block",
+      })),
     assistantPromptsLeft: MAX_ASSISTANT_PROMPTS - evs.filter((e) => e.type === "assistant_prompt").length,
     conversation: evs
       .filter((e) => e.type === "persona_message" || e.type === "candidate_message")

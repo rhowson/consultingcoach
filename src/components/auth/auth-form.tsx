@@ -7,8 +7,6 @@ import { CircleAlert } from "lucide-react";
 import { api, ApiError } from "@/lib/client/api";
 import { Button } from "@/components/ui/button";
 
-const DEMO = { email: "priya@demo.consultingcoach.app", password: "coachdemo" };
-
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -73,11 +71,6 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           <Button type="submit" size="lg" disabled={busy}>
             {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
           </Button>
-          {mode === "login" && (
-            <Button type="button" variant="secondary" disabled={busy} onClick={() => submit(DEMO)}>
-              Try the demo as Priya
-            </Button>
-          )}
         </form>
 
         <p className="m-0 text-center text-sm text-muted">

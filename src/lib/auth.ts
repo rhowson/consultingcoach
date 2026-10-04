@@ -58,6 +58,6 @@ export type User = typeof schema.users.$inferSelect;
 
 /** Strip secrets before sending a user to the client. */
 export function publicUser(u: User) {
-  const { passwordHash: _omit, ...rest } = u;
+  const { passwordHash: _hash, failedLoginCount: _failed, lockedUntil: _locked, ...rest } = u;
   return rest;
 }

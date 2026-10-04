@@ -38,7 +38,7 @@ cp .env.example .env            # fill in DATABASE_URL, AUTH_SECRET, optionally 
 docker compose up -d db         # or use any Postgres 16
 npm install
 npm run db:migrate
-npm run db:seed                 # content + demo user priya@demo.consultingcoach.app / coachdemo
+npm run db:seed                 # content + demo user priya@demo.consultingcoach.app (password: DEMO_PASSWORD, or "coachdemo" locally)
 npm run dev
 ```
 
@@ -95,7 +95,7 @@ The live app runs in the Railway project `consultingcoach` (service `app` + `Pos
 | Pre-deploy command | `npm run db:migrate && npm run db:seed` (idempotent) |
 | Start command | `npm run start` |
 | Health check | `/api/health` (fails if the database has no tables) |
-| Variables | `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`, `AUTH_SECRET`, `NODE_ENV=production`, optional `ANTHROPIC_API_KEY` |
+| Variables | `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`, `AUTH_SECRET`, `NODE_ENV=production`, `DEMO_PASSWORD` (demo account password), `ANTHROPIC_API_KEY` |
 
 Deploy-on-push needs the Railway GitHub App installed on the repository.
 

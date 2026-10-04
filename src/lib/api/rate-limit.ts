@@ -9,15 +9,17 @@ const LIMITS = {
   message: { max: 30, windowMs: 60_000 }, // simulator turns
   evaluate: { max: 20, windowMs: 60 * 60_000 }, // feedback reports, studio submit
   review: { max: 30, windowMs: 60 * 60_000 }, // studio "ask for review", red pen
+  login: { max: 20, windowMs: 15 * 60_000 }, // sign-in attempts per IP
 } as const;
 
 export type LimitKind = keyof typeof LIMITS;
 
 const windows = new Map<string, { start: number; count: number }>();
 
-export function checkRateLimit(userId: string, kind: LimitKind, now = Date.now()) {
+/** `subject` is a user id, or `ip:<address>` for unauthenticated endpoints. */
+export function checkRateLimit(subject: string, kind: LimitKind, now = Date.now()) {
   const { max, windowMs } = LIMITS[kind];
-  const key = `${kind}:${userId}`;
+  const key = `${kind}:${subject}`;
   const w = windows.get(key);
   if (!w || now - w.start >= windowMs) {
     windows.set(key, { start: now, count: 1 });

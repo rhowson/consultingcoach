@@ -45,6 +45,9 @@ export const users = pgTable("users", {
   weeklyRepGoal: integer("weekly_rep_goal").notNull().default(5),
   coachTone: text("coach_tone").$type<"supportive" | "direct" | "partner">().notNull().default("direct"),
   onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
+  /** Consecutive failed sign-ins; reset on success or when a lockout starts. */
+  failedLoginCount: integer("failed_login_count").notNull().default(0),
+  lockedUntil: timestamp("locked_until", { withTimezone: true }),
   createdAt: createdAt(),
 });
 

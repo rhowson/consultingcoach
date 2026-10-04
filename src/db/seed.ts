@@ -38,11 +38,17 @@ for (const l of lessons) await upsert(schema.lessons, [{ practiceScenarioId: nul
 
 // Demo user — matches the story used across the design spec.
 const demoEmail = "priya@demo.consultingcoach.app";
+// Set DEMO_PASSWORD in production (never commit it). The fallback is for local development only.
+const demoPassword = process.env.DEMO_PASSWORD ?? "coachdemo";
+if (!process.env.DEMO_PASSWORD && process.env.NODE_ENV === "production") {
+  console.warn("DEMO_PASSWORD is not set — the demo account is using the development password.");
+}
+const demoPasswordHash = await bcrypt.hash(demoPassword, 12);
 const [demo] = await db
   .insert(schema.users)
   .values({
     email: demoEmail,
-    passwordHash: await bcrypt.hash("coachdemo", 12),
+    passwordHash: demoPasswordHash,
     name: "Priya Shah",
     currentLevel: "consultant",
     targetLevel: "manager",
@@ -50,7 +56,8 @@ const [demo] = await db
     goal: "promotion",
     onboardedAt: new Date(),
   })
-  .onConflictDoUpdate({ target: schema.users.email, set: { name: "Priya Shah" } })
+  // Keep the demo password in sync with DEMO_PASSWORD on every deploy.
+  .onConflictDoUpdate({ target: schema.users.email, set: { name: "Priya Shah", passwordHash: demoPasswordHash } })
   .returning();
 
 const demoScores = {
@@ -88,5 +95,5 @@ if (!existingPlan) {
 }
 
 console.log(`Seeded ${personas.length} personas, ${scenarios.length} scenarios, ${lessons.length} lessons.`);
-console.log(`Demo login: ${demoEmail} / coachdemo`);
+console.log(`Demo account: ${demoEmail} (password from DEMO_PASSWORD${process.env.DEMO_PASSWORD ? "" : ", using the dev default"})`);
 await pool.end();

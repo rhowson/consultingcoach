@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { ZodError, type ZodType } from "zod";
 import { getCurrentUser, type User } from "@/lib/auth";
 import { AiRefusalError, AiUnavailableError } from "@/lib/ai/client";
+import { isAssessorEmail } from "@/lib/env";
 
 export class HttpError extends Error {
   constructor(
@@ -27,6 +28,13 @@ export const badRequest = (message: string) => new HttpError(400, message, "bad_
 export async function requireUser(): Promise<User> {
   const user = await getCurrentUser();
   if (!user) throw new HttpError(401, "Sign in required", "unauthorized");
+  return user;
+}
+
+/** Assessors (ASSESSOR_EMAILS) run interviews and can read candidate reports. */
+export async function requireAssessor(): Promise<User> {
+  const user = await requireUser();
+  if (!isAssessorEmail(user.email)) throw new HttpError(403, "Only assessors can do that", "forbidden");
   return user;
 }
 

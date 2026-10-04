@@ -14,7 +14,7 @@ import {
   type Level,
 } from "@/lib/competency";
 import type { User } from "@/lib/auth";
-import { aiMode } from "@/lib/env";
+import { aiMode, isAssessorEmail } from "@/lib/env";
 import type { CriterionScore } from "@/lib/types";
 
 export type Scores = Partial<Record<Competency, number>>;
@@ -146,6 +146,7 @@ export async function getShellData(user: User) {
     readiness: readinessPercent(scores),
     streakDays: streakDays(completed.map((a) => a.completedAt!).filter(Boolean)),
     aiMode,
+    isAssessor: isAssessorEmail(user.email),
   };
 }
 

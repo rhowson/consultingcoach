@@ -8,6 +8,7 @@ All endpoints are JSON over HTTPS under `/api`. Authentication is a `cc_session`
 | --- | --- |
 | 400 | `bad_request` |
 | 401 | `unauthorized`, `invalid_credentials` |
+| 403 | `forbidden` |
 | 404 | `not_found`, `report_not_ready` |
 | 409 | `email_taken`, `attempt_closed`, `awaiting_reply`, `turn_limit`, `attempt_busy`, `no_hints`, `submitted` |
 | 422 | `validation_error` (with Zod `issues`) |
@@ -145,6 +146,51 @@ The `storyboard` object has this shape: `{ id, stage: "pyramid"|"ghost_deck"|"re
 
 - **POST `/red-pen`** takes `{ title, content (plain text), deliverableType: "steerco_deck"|"client_email"|"memo"|"exec_summary", targetLevel }`. It returns `201 { review: { …, result: { verdict, headline, topChanges[], annotations: [{ id, quote, severity, comment, rewrite }] } } }`.
 - **GET `/red-pen`** returns `{ reviews }` (without content). **GET `/red-pen/:id`** returns `{ review }`. **DELETE `/red-pen/:id`** deletes it.
+
+## Interview assessments
+
+A timed, four-section exercise for candidates, set up and reviewed by assessors. The content pack is in `src/content/assessment.ts`.
+
+### Assessor endpoints
+
+These need a signed-in user whose email is in `ASSESSOR_EMAILS`. Other users get `403 forbidden`.
+
+| Method | Path | Body | Returns |
+| --- | --- | --- | --- |
+| GET | `/assess/interviews` | none | `{ interviews, packs }` |
+| POST | `/assess/interviews` | `{ candidateName, candidateEmail?, targetLevel, packId }` | `201 { interview, token }`. The token is shown once; only its SHA-256 hash is stored. The candidate link is `/interview/:token` and is valid for 14 days. |
+| GET | `/assess/interviews/:id` | none | The full report: sections, answers, the event log (assistant prompts and replies, guardrail blocks, pastes, tab switches), metrics and the AI-scored `result` |
+| PATCH | `/assess/interviews/:id` | `{ assessorNotes?, revoke? }` | The report |
+| DELETE | `/assess/interviews/:id` | none | `{ deleted }` |
+| POST | `/assess/interviews/:id/link` | none | `{ token }`; issues a new link and invalidates the old one (only before the candidate starts) |
+| POST | `/assess/interviews/:id/rescore` | none | The report; rescores synchronously (use after a scoring error) |
+
+### Candidate endpoints
+
+These are authenticated by the link token, not a session cookie. The server enforces the whole exercise:
+
+- Sections run in order, each with a server-side deadline (plus 20 seconds of grace for network delay).
+- When a section passes its deadline, it closes automatically with whatever answers were saved.
+- Submitted sections are locked.
+- The case pack stays hidden until the first section starts, the AI pre-read until section 2, and the client persona until section 3.
+
+| Method | Path | Body | Returns |
+| --- | --- | --- | --- |
+| GET | `/interview/:token` | none | The candidate view: status, sections with deadlines, and the content unlocked so far |
+| POST | `/interview/:token/consent` | none | The candidate view |
+| POST | `/interview/:token/sections/:sectionId/start` | none | The candidate view |
+| PUT | `/interview/:token/sections/:sectionId` | `{ answers: Record<questionId, string>, submit? }` | The candidate view; with `submit: false` this is an autosave |
+| POST | `/interview/:token/assistant` | `{ message }` | `{ reply, blocked, category, promptsLeft }` |
+| POST | `/interview/:token/conversation` | `{ message }` | `{ reply, turnsLeft }` |
+| POST | `/interview/:token/telemetry` | `{ events: [{ type: "paste"|"tab_hidden"|"tab_visible"|…, sectionId?, meta? }] }` | `{ recorded }` |
+
+**AI guardrails.**
+
+- The assistant only works during the AI section, with a limit of 25 prompts of up to 1,500 characters each.
+- Every prompt goes through two checks before the assistant answers:
+  1. a deterministic prompt-injection filter;
+  2. a classifier that blocks requests to write the final answer, off-topic requests, questions about other sections, attempts to game the assessment, and injection attempts.
+- Blocked prompts get a fixed refusal and are logged. The assistant is limited to the case pack and never writes the memo.
 
 ## Health
 

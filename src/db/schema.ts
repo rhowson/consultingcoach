@@ -220,3 +220,99 @@ export const redPenReviews = pgTable("red_pen_reviews", {
   result: jsonb("result").$type<RedPenResult>(),
   createdAt: createdAt(),
 }, (t) => [index("red_pen_reviews_user_idx").on(t.userId, t.createdAt)]);
+
+// ---------- Interview assessments ----------
+
+export type InterviewStatus = "invited" | "in_progress" | "submitted" | "scored" | "revoked";
+
+export interface InterviewSectionState {
+  sectionId: string;
+  startedAt: string;
+  /** Server-enforced deadline (ISO). Writes after it are rejected. */
+  deadline: string;
+  submittedAt: string | null;
+  /** True when the section closed because time ran out. */
+  timedOut: boolean;
+  answers: Record<string, string>;
+}
+
+export interface InterviewResult {
+  dimensions: { id: string; label: string; score: number; rationale: string; evidence: string[] }[];
+  overallScore: number;
+  recommendation: "strong_yes" | "yes" | "lean_no" | "no";
+  summary: string;
+  strengths: string[];
+  concerns: string[];
+  followUpQuestions: string[];
+  plantedError: "caught" | "partially" | "missed";
+  plantedErrorEvidence: string;
+  integrityConcerns: string[];
+  metrics: InterviewMetrics;
+}
+
+export interface InterviewMetrics {
+  assistantPrompts: number;
+  guardrailBlocks: number;
+  pasteEvents: number;
+  largestPasteChars: number;
+  tabAwayCount: number;
+  tabAwaySeconds: number;
+  memoWords: number;
+  /** Share of the memo's 8-word phrases that also appear in assistant replies (0–100). */
+  memoOverlapWithAssistant: number;
+  sectionMinutes: Record<string, number>;
+  timedOutSections: string[];
+}
+
+export const interviews = pgTable(
+  "interviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** SHA-256 of the candidate link token; the token itself is only shown once. */
+    tokenHash: text("token_hash").notNull().unique(),
+    packId: text("pack_id").notNull(),
+    candidateName: text("candidate_name").notNull(),
+    candidateEmail: text("candidate_email"),
+    targetLevel: text("target_level").$type<Level>().notNull(),
+    createdBy: uuid("created_by").references(() => users.id, { onDelete: "set null" }),
+    status: text("status").$type<InterviewStatus>().notNull().default("invited"),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    consentAt: timestamp("consent_at", { withTimezone: true }),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    sections: jsonb("sections").$type<InterviewSectionState[]>().notNull().default([]),
+    result: jsonb("result").$type<InterviewResult>(),
+    scoringModel: text("scoring_model"),
+    scoringError: text("scoring_error"),
+    assessorNotes: text("assessor_notes"),
+    createdAt: createdAt(),
+  },
+  (t) => [index("interviews_created_by_idx").on(t.createdBy, t.createdAt)],
+);
+
+export type InterviewEventType =
+  | "assistant_prompt"
+  | "assistant_reply"
+  | "guardrail_block"
+  | "persona_message"
+  | "candidate_message"
+  | "paste"
+  | "copy_blocked"
+  | "tab_hidden"
+  | "tab_visible"
+  | "section_started"
+  | "section_submitted";
+
+export const interviewEvents = pgTable(
+  "interview_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    interviewId: uuid("interview_id").notNull().references(() => interviews.id, { onDelete: "cascade" }),
+    sectionId: text("section_id"),
+    type: text("type").$type<InterviewEventType>().notNull(),
+    content: text("content"),
+    meta: jsonb("meta").$type<Record<string, unknown>>(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("interview_events_interview_idx").on(t.interviewId, t.createdAt)],
+);

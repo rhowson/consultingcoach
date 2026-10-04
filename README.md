@@ -18,6 +18,8 @@ The front end is built from the Claude Design project (tokens, Home, Client Simu
 | Partner Red Pen | `/red-pen`, `/red-pen/:id` |
 | Progress | `/progress` |
 | Settings | `/settings` |
+| Interview assessments (assessors) | `/assess`, `/assess/:id` |
+| Timed interview (candidates, by link) | `/interview/:token` |
 
 ## Stack
 
@@ -29,7 +31,7 @@ The front end is built from the Claude Design project (tokens, Home, Client Simu
 | Auth | Email + password (bcrypt), signed JWT session cookie (`jose`) |
 | AI | Claude API via `@anthropic-ai/sdk` (`claude-opus-5` by default) |
 | Tests | Vitest |
-| Deploy | Railway (`railway.json`) |
+| Deploy | Railway |
 
 ## Getting started
 
@@ -68,6 +70,35 @@ Scenarios are UK technology and transformation engagements, priced in £, tagged
 | Commercial advisory & decision support | Your benefits case is wrong (CFO, Consultant); The 10-minute CEO (Chief Executive, Director) | Calder Water: renew, re-tender or insource IT services? (Manager) |
 
 Retired scenarios (`retiredScenarioIds`) stay in the database so old reports still work, but are hidden from the catalogue.
+
+## Interview assessment mode
+
+Use this to assess candidates in interviews. An assessor creates an interview at `/assess` and sends the candidate a one-time link. The candidate doesn't need an account.
+
+The exercise lasts 60 minutes, has four timed sections and is set on one UK case (Kestrel Energy: AI in customer service):
+
+| Section | Time | Tests | AI |
+| --- | --- | --- | --- |
+| 1. Read and frame the problem | 15 min | Critical thinking: problem framing, hypothesis, scepticism about the data | None |
+| 2. Analyse with an AI assistant | 20 min | AI fluency and commercial judgement: a 300-word CEO memo | A scoped assistant |
+| 3. Defend it to the client | 10 min | Communication: a live conversation with the CCO about the memo | None |
+| 4. Reflect | 5 min | Self-awareness about how they used AI | None |
+
+**Guardrails.**
+
+- The assistant exists only in section 2. It answers only from the case pack and won't write the memo.
+- Every prompt is screened first by a deterministic prompt-injection filter and then by a classifier.
+- Blocked prompts get a fixed refusal and are logged.
+- Timers, section order and answer locking are enforced on the server.
+
+**What the report shows.**
+
+- The AI pre-read contains a planted error, and the report says whether the candidate caught it.
+- Integrity signals: pastes, tab switches, and how much of the memo overlaps assistant replies.
+- Scores (1–5) on critical thinking, communication, AI fluency and commercial judgement, each with evidence.
+- A hire recommendation and follow-up questions for the live interview.
+
+Only users whose email is in `ASSESSOR_EMAILS` can see `/assess`. In production, scoring needs `ANTHROPIC_API_KEY`.
 
 ## How the coaching engine works
 
@@ -109,7 +140,7 @@ The live app runs in the Railway project `consultingcoach` (service `app` + `Pos
 | Pre-deploy command | `npm run db:migrate && npm run db:seed` (idempotent) |
 | Start command | `npm run start` |
 | Health check | `/api/health` (fails if the database has no tables) |
-| Variables | `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`, `AUTH_SECRET`, `NODE_ENV=production`, `DEMO_PASSWORD` (demo account password), `ANTHROPIC_API_KEY` (required: without it AI features are off in production, never simulated), optional `SIGNUP_ACCESS_CODE` (invite-only sign-up), optional `AI_MODEL` |
+| Variables | `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`, `AUTH_SECRET`, `NODE_ENV=production`, `DEMO_PASSWORD` (demo account password), `ANTHROPIC_API_KEY` (required: without it AI features are off in production, never simulated), optional `SIGNUP_ACCESS_CODE` (invite-only sign-up), `ASSESSOR_EMAILS` (comma-separated; who can run interview assessments), optional `AI_MODEL` |
 
 Deploy-on-push needs the Railway GitHub App installed on the repository.
 
@@ -119,4 +150,3 @@ Deploy-on-push needs the Railway GitHub App installed on the repository.
 - Pro plan / billing
 - File parsing for Red Pen uploads (the API takes plain text for now)
 - Voice mode and the B2B team dashboard
-- Rate limiting on AI endpoints

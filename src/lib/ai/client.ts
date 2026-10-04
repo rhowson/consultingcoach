@@ -78,3 +78,27 @@ export async function* streamText(opts: {
   const final = await stream.finalMessage();
   if (final.stop_reason === "refusal") throw new AiRefusalError(final.stop_details?.category);
 }
+
+/** Non-streaming text reply for a multi-turn conversation. */
+export async function generateText(opts: {
+  system: string;
+  messages: Anthropic.Beta.BetaMessageParam[];
+  effort?: Effort;
+  maxTokens?: number;
+}): Promise<string> {
+  const response = await getClient().beta.messages.create({
+    ...FALLBACK,
+    model: env.AI_MODEL,
+    max_tokens: opts.maxTokens ?? 1500,
+    cache_control: { type: "ephemeral" },
+    system: opts.system,
+    messages: opts.messages,
+    output_config: { effort: opts.effort ?? "low" },
+  });
+  if (response.stop_reason === "refusal") throw new AiRefusalError(response.stop_details?.category);
+  return response.content
+    .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")
+    .map((b) => b.text)
+    .join("")
+    .trim();
+}

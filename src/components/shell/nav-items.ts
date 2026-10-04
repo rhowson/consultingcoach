@@ -1,4 +1,4 @@
-import { BookOpen, LayoutDashboard, PanelsTopLeft, PenLine, Settings, Target, TrendingUp } from "lucide-react";
+import { BookOpen, ClipboardCheck, LayoutDashboard, PanelsTopLeft, PenLine, Settings, Target, TrendingUp } from "lucide-react";
 
 export const NAV = [
   { href: "/", label: "Home", Icon: LayoutDashboard, mobile: true },
@@ -10,11 +10,15 @@ export const NAV = [
   { href: "/settings", label: "Settings", Icon: Settings, mobile: false },
 ] as const;
 
+/** Only shown to assessors. */
+export const ASSESSOR_NAV = { href: "/assess", label: "Assessments", Icon: ClipboardCheck, mobile: false } as const;
+
 export function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export function titleFor(pathname: string) {
   if (pathname.startsWith("/feedback")) return "Feedback";
+  if (isActive(pathname, ASSESSOR_NAV.href)) return ASSESSOR_NAV.label;
   return NAV.find((n) => isActive(pathname, n.href))?.label ?? "Consulting Coach";
 }

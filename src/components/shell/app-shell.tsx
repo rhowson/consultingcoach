@@ -8,7 +8,7 @@ import type { Level } from "@/lib/competency";
 import { LEVEL_LABELS } from "@/lib/competency";
 import { ReadinessPill } from "@/components/ui/badges";
 import { UserAvatar } from "@/components/ui/avatar";
-import { NAV, isActive, titleFor } from "./nav-items";
+import { ASSESSOR_NAV, NAV, isActive, titleFor } from "./nav-items";
 
 export interface ShellData {
   name: string;
@@ -17,11 +17,13 @@ export interface ShellData {
   readiness: number;
   streakDays: number;
   aiMode: "live" | "mock" | "off";
+  isAssessor: boolean;
 }
 
 export function AppShell({ data, children }: { data: ShellData; children: React.ReactNode }) {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
+  const nav = data.isAssessor ? [...NAV, ASSESSOR_NAV] : [...NAV];
 
   return (
     <div className="flex min-h-screen bg-bg">
@@ -35,7 +37,7 @@ export function AppShell({ data, children }: { data: ShellData; children: React.
           <span className="font-serif text-lg font-semibold tracking-tight">Consulting Coach</span>
         </Link>
         <div className="flex flex-col gap-0.5">
-          {NAV.map(({ href, label, Icon }) => {
+          {nav.map(({ href, label, Icon }) => {
             const active = isActive(pathname, href);
             return (
               <Link
@@ -119,7 +121,7 @@ export function AppShell({ data, children }: { data: ShellData; children: React.
         </button>
         {moreOpen && (
           <div className="absolute right-2 bottom-[72px] flex w-56 flex-col rounded-lg border border-border bg-surface p-1 shadow-lg">
-            {NAV.filter((n) => !n.mobile).map(({ href, label, Icon }) => (
+            {nav.filter((n) => !n.mobile).map(({ href, label, Icon }) => (
               <Link key={href} href={href} onClick={() => setMoreOpen(false)} className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-ink no-underline hover:bg-hover">
                 <Icon size={18} strokeWidth={1.5} aria-hidden />
                 {label}

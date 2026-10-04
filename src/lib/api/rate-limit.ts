@@ -11,6 +11,7 @@ const LIMITS = {
   review: { max: 30, windowMs: 60 * 60_000 }, // studio "ask for review", red pen
   login: { max: 20, windowMs: 15 * 60_000 }, // sign-in attempts per IP
   signup: { max: 10, windowMs: 60 * 60_000 }, // new accounts per IP
+  telemetry: { max: 60, windowMs: 60_000 }, // interview integrity events per interview
 } as const;
 
 export type LimitKind = keyof typeof LIMITS;

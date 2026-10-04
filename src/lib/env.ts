@@ -8,6 +8,8 @@ const schema = z.object({
   AI_MOCK: z.string().optional(),
   /** When set, new accounts need this code to sign up (invite-only assessments). */
   SIGNUP_ACCESS_CODE: z.string().optional(),
+  /** Comma-separated emails allowed to run interview assessments and see candidate reports. */
+  ASSESSOR_EMAILS: z.string().optional(),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
@@ -34,3 +36,9 @@ export const aiMockMode = aiMode === "mock";
 
 /** Recorded on every feedback report so a score can be traced to what produced it. */
 export const scoringModel = aiMode === "mock" ? "mock" : env.AI_MODEL;
+
+/** Assessors can create interviews and read candidate reports. Configured by email so it can't be self-granted. */
+export function isAssessorEmail(email: string) {
+  const list = (env.ASSESSOR_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+  return list.includes(email.toLowerCase());
+}

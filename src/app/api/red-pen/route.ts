@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { LEVELS } from "@/lib/competency";
 import { json, parseBody, requireUser, route } from "@/lib/api/http";
+import { checkRateLimit } from "@/lib/api/rate-limit";
 import { createReview, listReviews } from "@/lib/services/redpen";
 
 export const maxDuration = 120;
@@ -17,5 +18,6 @@ const Body = z.object({
 
 export const POST = route(async (req) => {
   const user = await requireUser();
+  checkRateLimit(user.id, "review");
   return json({ review: await createReview(user, await parseBody(req, Body)) }, { status: 201 });
 });

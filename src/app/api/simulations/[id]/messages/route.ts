@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { parseBody, requireUser, route } from "@/lib/api/http";
+import { checkRateLimit } from "@/lib/api/rate-limit";
 import { prepareMessage } from "@/lib/services/attempts";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -18,6 +19,7 @@ const Body = z.object({ content: z.string().trim().min(1).max(4000) });
  */
 export const POST = route<Ctx>(async (req, { params }) => {
   const user = await requireUser();
+  checkRateLimit(user.id, "message");
   const { content } = await parseBody(req, Body);
   // Validation errors (closed session, awaiting reply) throw here, before the stream opens.
   const events = await prepareMessage(user, (await params).id, content);

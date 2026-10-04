@@ -1,6 +1,8 @@
+import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { ZodError, type ZodType } from "zod";
 import { getCurrentUser, type User } from "@/lib/auth";
+import { AiRefusalError } from "@/lib/ai/client";
 
 export class HttpError extends Error {
   constructor(
@@ -53,6 +55,26 @@ export function route<C = unknown>(handler: Handler<C>): Handler<C> {
         return NextResponse.json(
           { error: { code: "validation_error", message: "Invalid request", issues: err.issues } },
           { status: 422 },
+        );
+      }
+      if (err instanceof AiRefusalError) {
+        return NextResponse.json(
+          { error: { code: "ai_refused", message: "The AI coach couldn't respond to that. Try rephrasing." } },
+          { status: 422 },
+        );
+      }
+      if (err instanceof Anthropic.APIError) {
+        // Auth/permission problems are configuration errors (bad or missing key); everything else is transient.
+        console.error(`Claude API error ${err.status}:`, err.message);
+        const config = err instanceof Anthropic.AuthenticationError || err instanceof Anthropic.PermissionDeniedError;
+        return NextResponse.json(
+          {
+            error: {
+              code: config ? "ai_misconfigured" : "ai_unavailable",
+              message: config ? "The AI coach isn't configured correctly." : "The AI coach is busy right now — please try again in a moment.",
+            },
+          },
+          { status: config ? 503 : 502 },
         );
       }
       console.error(err);

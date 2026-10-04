@@ -1,4 +1,5 @@
 import { json, requireUser, route } from "@/lib/api/http";
+import { checkRateLimit } from "@/lib/api/rate-limit";
 import { completeSimulation } from "@/lib/services/attempts";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -9,5 +10,6 @@ export const maxDuration = 300;
 /** End the conversation and generate the feedback report. Idempotent once completed. */
 export const POST = route<Ctx>(async (_req, { params }) => {
   const user = await requireUser();
+  checkRateLimit(user.id, "evaluate");
   return json(await completeSimulation(user, (await params).id));
 });

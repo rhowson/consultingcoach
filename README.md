@@ -86,9 +86,18 @@ drizzle/            SQL migrations
 
 ## Deploying to Railway
 
-1. Create a project with a **Postgres** service and a service from this repo.
-2. Set `DATABASE_URL` (reference the Postgres variable), `AUTH_SECRET` (`openssl rand -base64 32`) and `ANTHROPIC_API_KEY` on the app service.
-3. Deploy. `railway.json` runs migrations before each deploy and health-checks `/api/health`. Run `npm run db:seed` once (for example with `railway run npm run db:seed`) to load content.
+The live app runs in the Railway project `consultingcoach` (service `app` + `Postgres`). The service settings are configured in Railway itself (Railway no longer reads `railway.json`):
+
+| Setting | Value |
+| --- | --- |
+| Source | `rhowson/consultingcoach`, branch `claude/busy-einstein-lxzanf` |
+| Build command | `npm run build` |
+| Pre-deploy command | `npm run db:migrate && npm run db:seed` (idempotent) |
+| Start command | `npm run start` |
+| Health check | `/api/health` (fails if the database has no tables) |
+| Variables | `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`, `AUTH_SECRET`, `NODE_ENV=production`, optional `ANTHROPIC_API_KEY` |
+
+Deploy-on-push needs the Railway GitHub App installed on the repository.
 
 ## Not built yet
 

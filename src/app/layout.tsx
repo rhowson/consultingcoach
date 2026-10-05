@@ -7,7 +7,7 @@ const display = Inter_Tight({ subsets: ["latin"], weight: ["500", "600", "700"],
 
 export const metadata: Metadata = {
   title: "Consulting Coach",
-  description: "Practise client conversations, storylines and SteerCo delivery with an AI coach — from Analyst to Director.",
+  description: "Practise client conversations, build storylines and get partner reviews with an AI coach, from Analyst to Director.",
   // Private assessment tool: keep it out of search engines.
   robots: { index: false, follow: false },
 };

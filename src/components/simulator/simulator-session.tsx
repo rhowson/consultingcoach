@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowUp, CircleAlert, Lightbulb, Mic, TrendingDown, TrendingUp, X } from "lucide-react";
+import { ArrowUp, CircleAlert, Lightbulb, PanelLeftOpen, TrendingDown, TrendingUp, X } from "lucide-react";
 import { api, ApiError, type SimulationView } from "@/lib/client/api";
 import type { Mood } from "@/lib/types";
 import { MOODS } from "@/lib/types";
@@ -51,6 +51,7 @@ export function SimulatorSession({ initial }: { initial: SimulationView }) {
   const [exitOpen, setExitOpen] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [sheet, setSheet] = useState<Sheet>(null);
+  const [briefOpen, setBriefOpen] = useState(true);
   const [elapsed, setElapsed] = useState(0);
   const [announce, setAnnounce] = useState("");
 
@@ -58,6 +59,8 @@ export function SimulatorSession({ initial }: { initial: SimulationView }) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const briefCloseRef = useRef<HTMLButtonElement>(null);
   const signalsCloseRef = useRef<HTMLButtonElement>(null);
+  const briefCollapseRef = useRef<HTMLButtonElement>(null);
+  const briefExpandRef = useRef<HTMLButtonElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const endTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const elapsedRef = useRef(0);
@@ -265,10 +268,19 @@ export function SimulatorSession({ initial }: { initial: SimulationView }) {
     router.push("/practice");
   }
 
-  const sheetClass = (which: Exclude<Sheet, null>) =>
-    sheet === which
-      ? "fixed inset-x-0 bottom-0 z-40 flex max-h-[80dvh] flex-col overflow-y-auto rounded-t-xl bg-surface shadow-[0_-8px_32px_rgba(0,0,0,0.16)] lg:static lg:z-auto lg:max-h-none lg:w-[280px] lg:flex-none lg:rounded-none lg:shadow-none"
-      : "hidden lg:flex lg:w-[280px] lg:flex-none lg:flex-col lg:overflow-y-auto lg:bg-surface";
+  /** Desktop only: collapse or expand the briefing rail, keeping focus on the toggle. */
+  function toggleBrief(open: boolean) {
+    setBriefOpen(open);
+    requestAnimationFrame(() => (open ? briefCollapseRef : briefExpandRef).current?.focus());
+  }
+
+  // Side rails are bottom sheets on phones and fixed columns on desktop.
+  const sheetClass = (which: Exclude<Sheet, null>, width = "lg:w-[280px]") =>
+    `${
+      sheet === which
+        ? "fixed inset-x-0 bottom-0 z-40 flex max-h-[80dvh] flex-col overflow-y-auto rounded-t-xl bg-surface shadow-lg lg:static lg:z-auto lg:max-h-none lg:flex-none lg:rounded-none lg:shadow-none"
+        : "hidden lg:flex lg:flex-none lg:flex-col lg:overflow-y-auto lg:bg-surface"
+    } ${width}`;
 
   const sheetHeader = (title: string, ref: React.RefObject<HTMLButtonElement | null>) => (
     <div className="flex items-center justify-between px-5 pt-4 lg:hidden">
@@ -292,9 +304,11 @@ export function SimulatorSession({ initial }: { initial: SimulationView }) {
       <SimStyles />
       <SessionHeader
         title={scenario.title}
-        subtitle={`Client Simulator${persona.company ? ` · ${persona.company}` : ""}`}
+        subtitle={`Client conversation${persona.company ? ` · ${persona.company}` : ""}`}
         elapsed={elapsed}
         durationMin={scenario.durationMin}
+        turn={userTurns}
+        maxTurns={scenario.maxTurns}
         targetLevel={initial.attempt.targetLevel}
         hintsLeft={hintsLeft}
         hintBusy={hintBusy}
@@ -331,14 +345,33 @@ export function SimulatorSession({ initial }: { initial: SimulationView }) {
           aria-controls="sim-signals"
           className="h-8 flex-none rounded-md border border-border bg-surface px-2.5 text-[13px] font-medium text-ink hover:bg-hover"
         >
-          Signals
+          Objectives
         </button>
       </div>
 
       <div className="flex min-h-0 flex-1">
-        <aside id="sim-brief" aria-label="Brief" className={`${sheetClass("brief")} lg:border-r lg:border-border`}>
+        <aside id="sim-brief" aria-label="Briefing" className={`${sheetClass("brief", briefOpen ? "lg:w-[280px]" : "lg:w-14")} lg:border-r lg:border-border`}>
           {sheetHeader("Brief", briefCloseRef)}
-          <BriefingPanel briefing={scenario.briefing} notesKey={`cc:sim-notes:${id}`} />
+          <BriefingPanel
+            briefing={scenario.briefing}
+            onCollapse={() => toggleBrief(false)}
+            collapseRef={briefCollapseRef}
+            className={briefOpen ? "" : "lg:hidden"}
+          />
+          {!briefOpen && (
+            <button
+              ref={briefExpandRef}
+              type="button"
+              onClick={() => toggleBrief(true)}
+              aria-expanded={false}
+              aria-controls="sim-brief"
+              aria-label="Show briefing"
+              title="Show briefing"
+              className="mx-auto mt-5 hidden h-9 w-9 items-center justify-center rounded-md bg-transparent text-muted hover:bg-hover hover:text-ink lg:flex"
+            >
+              <PanelLeftOpen size={18} aria-hidden />
+            </button>
+          )}
         </aside>
 
         <section aria-label="Conversation" className="relative flex min-w-0 flex-1 flex-col">
@@ -439,15 +472,6 @@ export function SimulatorSession({ initial }: { initial: SimulationView }) {
                   />
                   <button
                     type="button"
-                    disabled
-                    title="Voice mode arrives in phase 2"
-                    aria-label="Voice mode, coming soon"
-                    className="flex h-9 w-9 flex-none cursor-not-allowed items-center justify-center rounded-md bg-transparent text-faint"
-                  >
-                    <Mic size={18} aria-hidden />
-                  </button>
-                  <button
-                    type="button"
                     onClick={() => void send()}
                     disabled={!canSend}
                     aria-label="Send"
@@ -466,9 +490,9 @@ export function SimulatorSession({ initial }: { initial: SimulationView }) {
           </div>
         </section>
 
-        <aside id="sim-signals" aria-label="Live signals" className={`${sheetClass("signals")} lg:border-l lg:border-border`}>
-          {sheetHeader("Signals", signalsCloseRef)}
-          <SignalsPanel persona={persona} mood={mood} turn={userTurns} maxTurns={scenario.maxTurns} objectives={objectives} />
+        <aside id="sim-signals" aria-label="Mood and objectives" className={`${sheetClass("signals")} lg:border-l lg:border-border`}>
+          {sheetHeader("Objectives", signalsCloseRef)}
+          <SignalsPanel persona={persona} mood={mood} objectives={objectives} />
         </aside>
       </div>
 

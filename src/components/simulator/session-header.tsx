@@ -1,14 +1,16 @@
-import { Clock, Lightbulb, X } from "lucide-react";
+import { Clock, Lightbulb, MessagesSquare, X } from "lucide-react";
 import { LEVEL_LABELS, type Level } from "@/lib/competency";
 
 export const fmtClock = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
-/** SessionHeader: exit, title, timer, target level, hint, end. */
+/** SessionHeader: exit, title, timer and turn, hint, end. */
 export function SessionHeader({
   title,
   subtitle,
   elapsed,
   durationMin,
+  turn,
+  maxTurns,
   targetLevel,
   hintsLeft,
   hintBusy,
@@ -21,6 +23,8 @@ export function SessionHeader({
   subtitle: string;
   elapsed: number;
   durationMin: number;
+  turn: number;
+  maxTurns: number;
   targetLevel: Level;
   hintsLeft: number;
   hintBusy: boolean;
@@ -44,20 +48,29 @@ export function SessionHeader({
       <span className="h-6 w-px flex-none bg-border" aria-hidden />
       <div className="flex min-w-0 flex-col leading-tight">
         <h1 className="m-0 truncate font-serif text-[17px] font-semibold">{title}</h1>
-        <span className="hidden truncate text-xs text-muted lg:block">{subtitle}</span>
+        <span className="hidden truncate text-xs text-muted lg:block">
+          {subtitle} · Target {LEVEL_LABELS[targetLevel]}
+        </span>
       </div>
       <div className="flex-1" />
-      <span role="timer" aria-label={`Time elapsed ${fmtClock(elapsed)} of ${durationMin} minutes`} className="tabular flex flex-none items-center gap-1.5 text-sm text-ink-2">
-        <Clock size={16} className={over ? "text-warning" : "text-muted"} aria-hidden />
-        <span aria-hidden>{fmtClock(elapsed)}</span>
-        <span className="hidden text-muted lg:inline" aria-hidden>
-          / {fmtClock(durationMin * 60)}
+      <div className="tabular flex flex-none items-center gap-4 text-sm text-ink-2">
+        <span role="timer" aria-label={`Time elapsed ${fmtClock(elapsed)} of ${durationMin} minutes`} className="flex items-center gap-1.5">
+          <Clock size={16} className={over ? "text-warning" : "text-muted"} aria-hidden />
+          <span aria-hidden>{fmtClock(elapsed)}</span>
+          <span className="hidden text-muted lg:inline" aria-hidden>
+            / {fmtClock(durationMin * 60)}
+          </span>
         </span>
-      </span>
-      <span className="hidden flex-none items-center gap-1.5 text-[13px] text-muted lg:flex">
-        Target
-        <span className="rounded-full border border-primary px-2 py-px text-xs font-semibold text-primary">{LEVEL_LABELS[targetLevel]}</span>
-      </span>
+        <span className="hidden items-center gap-1.5 lg:flex">
+          <MessagesSquare size={16} className="text-muted" aria-hidden />
+          <span className="sr-only">
+            Turn {turn} of about {maxTurns}
+          </span>
+          <span aria-hidden>
+            Turn {turn} <span className="text-muted">/ {maxTurns}</span>
+          </span>
+        </span>
+      </div>
       <button
         type="button"
         onClick={onHint}

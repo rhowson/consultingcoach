@@ -5,7 +5,7 @@ import { CONTAINER, SKY_PRIMARY } from "./primitives";
 
 export function FinalCta({ primaryHref, primaryLabel, signedIn }: { primaryHref: string; primaryLabel: string; signedIn: boolean }) {
   return (
-    <section aria-labelledby="cta-title" className="pb-20 sm:pb-24">
+    <section aria-labelledby="cta-title" className="py-24 sm:py-32">
       <div className={CONTAINER}>
         <div className="sky relative overflow-hidden rounded-2xl px-5 py-16 text-center shadow-lg sm:px-10 sm:py-24">
           <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-full bg-linear-to-b from-[rgba(10,40,80,0.2)] to-transparent" />
@@ -59,8 +59,13 @@ export function SiteFooter() {
               </a>
             </li>
             <li>
-              <a href="#pricing" className="text-ink-2 hover:text-ink">
-                Pricing
+              <a href="#how-it-works" className="text-ink-2 hover:text-ink">
+                How it works
+              </a>
+            </li>
+            <li>
+              <a href="#assessments" className="text-ink-2 hover:text-ink">
+                Assessments
               </a>
             </li>
             <li>

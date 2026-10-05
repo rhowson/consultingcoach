@@ -149,11 +149,12 @@ export function LessonView({ lesson }: { lesson: LessonData }) {
                 {lesson.practice.title}
               </h3>
               <span className="text-sm text-muted">
-                {lesson.practice.kind === "storyboard" ? "Storyboard Studio" : "Client Simulator"} · {lesson.practice.durationMin} min
+                {lesson.practice.kind === "storyboard" ? "Storyline" : "Client conversation"} · {lesson.practice.durationMin} min
               </span>
             </div>
           </div>
-          <ButtonLink href={practiceHref} className="self-start">
+          {/* One primary action at a time: finish the lesson first, then the rep. */}
+          <ButtonLink href={practiceHref} variant={completed ? "primary" : "secondary"} className="self-start">
             Start the rep <ArrowRight size={16} aria-hidden />
           </ButtonLink>
         </Card>

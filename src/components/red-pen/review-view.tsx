@@ -8,7 +8,7 @@ import { LEVEL_LABELS, type Level } from "@/lib/competency";
 import type { RedPenAnnotation, RedPenResult } from "@/lib/types";
 import { Card, CardTitle, Eyebrow } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LevelBadge, VerdictChip } from "@/components/ui/badges";
+import { VerdictChip } from "@/components/ui/badges";
 import { DELIVERABLE_LABEL, SEVERITIES, type DeliverableType } from "./meta";
 
 interface ReviewData {
@@ -74,20 +74,15 @@ export function ReviewView({ review }: { review: ReviewData }) {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
+      {/* Header: verdict and the top 3 changes lead; line-level notes follow below. */}
       <Card className="flex flex-col gap-5 p-6 md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex min-w-0 flex-col gap-2">
             <Eyebrow>
-              {DELIVERABLE_LABEL[review.deliverableType]} · {new Date(review.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+              {DELIVERABLE_LABEL[review.deliverableType]} · {LEVEL_LABELS[review.targetLevel]} bar ·{" "}
+              {new Date(review.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
             </Eyebrow>
             <h2 className="m-0 font-serif text-[26px] leading-tight font-semibold tracking-tight md:text-[28px]">{review.title}</h2>
-            <div className="flex flex-wrap items-center gap-2 text-[13px] text-muted">
-              {r && <VerdictChip verdict={r.verdict} />}
-              <span>Marked against the</span>
-              <LevelBadge level={review.targetLevel} />
-              <span>bar</span>
-            </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {confirming ? (
@@ -101,8 +96,8 @@ export function ReviewView({ review }: { review: ReviewData }) {
                 </Button>
               </>
             ) : (
-              <Button variant="secondary" size="sm" onClick={() => setConfirming(true)}>
-                <Trash2 size={15} aria-hidden /> Delete review
+              <Button variant="ghost" size="sm" onClick={() => setConfirming(true)}>
+                <Trash2 size={15} aria-hidden /> Delete
               </Button>
             )}
           </div>
@@ -113,22 +108,24 @@ export function ReviewView({ review }: { review: ReviewData }) {
           </p>
         )}
         {r ? (
-          <div className="grid grid-cols-1 gap-5 border-t border-border pt-5 lg:grid-cols-[1.2fr_1fr]">
-            <p className="m-0 font-serif text-xl leading-snug font-semibold text-ink">{r.headline}</p>
+          <div className="flex flex-col gap-5 border-t border-border pt-5">
+            <div className="flex flex-col items-start gap-2.5">
+              <VerdictChip verdict={r.verdict} />
+              <p className="m-0 max-w-[720px] font-serif text-xl leading-snug font-semibold text-ink">{r.headline}</p>
+            </div>
             {r.topChanges.length > 0 && (
-              <div className="flex flex-col gap-3">
-                <Eyebrow>Top {Math.min(3, r.topChanges.length)} changes</Eyebrow>
-                <ol className="m-0 flex list-none flex-col gap-2.5 p-0">
+              <section aria-labelledby="changes-title" className="flex flex-col gap-3">
+                <h3 id="changes-title" className="m-0 text-sm font-semibold">
+                  Top {Math.min(3, r.topChanges.length)} {r.topChanges.length === 1 ? "change" : "changes"}
+                </h3>
+                <ol className="m-0 max-w-[720px] list-decimal space-y-2.5 pl-5 text-[15px] text-ink marker:font-semibold marker:text-primary">
                   {r.topChanges.slice(0, 3).map((c, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm">
-                      <span className="w-4 flex-none font-serif text-xl leading-none font-semibold text-accent" aria-hidden>
-                        {i + 1}
-                      </span>
-                      <span>{c}</span>
+                    <li key={i} className="pl-1">
+                      {c}
                     </li>
                   ))}
                 </ol>
-              </div>
+              </section>
             )}
           </div>
         ) : (
@@ -142,7 +139,7 @@ export function ReviewView({ review }: { review: ReviewData }) {
           <Card aria-labelledby="doc-title" className="flex min-w-0 flex-col gap-4 p-6 lg:col-span-7">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <CardTitle id="doc-title">Your draft</CardTitle>
-              <span className="text-xs text-muted">{LEVEL_LABELS[review.targetLevel]} markup · numbered pins match the notes</span>
+              <span className="text-xs text-muted">Numbered pins match the notes</span>
             </div>
             <Document content={review.content} notes={notes} active={active} onFocusNote={setActive} pinClass={(n) => severityOf(n).pin} />
           </Card>

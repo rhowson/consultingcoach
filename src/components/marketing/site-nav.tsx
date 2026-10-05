@@ -9,7 +9,6 @@ const LINKS = [
   { href: "#features", label: "Features" },
   { href: "#how-it-works", label: "How it works" },
   { href: "#assessments", label: "Assessments" },
-  { href: "#pricing", label: "Pricing" },
 ];
 
 /** Floating glass pill nav. Collapses to a menu button below md. */

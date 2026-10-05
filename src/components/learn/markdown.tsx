@@ -2,8 +2,9 @@ import { Fragment, type ReactNode } from "react";
 
 /**
  * Tiny, safe markdown renderer for lesson copy. Supports paragraphs (blank
- * lines), line breaks, **bold**, *italic* and "quotes" (rendered with curly
- * quotes). Everything is emitted as React text nodes — never raw HTML.
+ * lines), bullet lists (every line starting "- "), line breaks, **bold**,
+ * *italic* and "quotes" (rendered with curly quotes). Everything is emitted as
+ * React text nodes — never raw HTML.
  */
 export function Markdown({ source, className = "" }: { source: string; className?: string }) {
   const paragraphs = source
@@ -13,16 +14,27 @@ export function Markdown({ source, className = "" }: { source: string; className
     .filter(Boolean);
   return (
     <div className={`flex flex-col gap-3 ${className}`}>
-      {paragraphs.map((p, i) => (
-        <p key={i} className="m-0">
-          {p.split("\n").map((line, j) => (
-            <Fragment key={j}>
-              {j > 0 && <br />}
-              {inline(line)}
-            </Fragment>
-          ))}
-        </p>
-      ))}
+      {paragraphs.map((p, i) => {
+        const lines = p.split("\n");
+        if (lines.every((l) => l.startsWith("- ")))
+          return (
+            <ul key={i} className="m-0 flex list-disc flex-col gap-1 pl-5">
+              {lines.map((l, j) => (
+                <li key={j}>{inline(l.slice(2))}</li>
+              ))}
+            </ul>
+          );
+        return (
+          <p key={i} className="m-0">
+            {lines.map((line, j) => (
+              <Fragment key={j}>
+                {j > 0 && <br />}
+                {inline(line)}
+              </Fragment>
+            ))}
+          </p>
+        );
+      })}
     </div>
   );
 }

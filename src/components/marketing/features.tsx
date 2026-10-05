@@ -1,86 +1,73 @@
-import { Check, GraduationCap, Highlighter, MessagesSquare, Presentation, Route, Sparkles, Timer, type LucideIcon } from "lucide-react";
+import { Check, GraduationCap, Highlighter, MessagesSquare, Presentation, Route, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { ReadinessRing } from "./app-preview";
-import { ArrowLink, CARD, CONTAINER, LIFT, SectionHeading } from "./primitives";
+import { CARD, CONTAINER, LIFT, SectionHeading } from "./primitives";
 
-type Feature = { title: string; body: string; Icon: LucideIcon; preview: ReactNode; wide?: boolean };
+type Feature = { title: string; body: string; Icon: LucideIcon; preview: ReactNode };
 
 const FEATURES: Feature[] = [
   {
-    title: "Client Simulator",
-    body: "Rehearse pushback, scope creep and bad news with client personas who react to what you actually say.",
+    title: "Practise client conversations",
+    body: "Handle pushback on scope, timelines and bad news from AI clients who react to what you actually say. Every conversation is scored, with feedback.",
     Icon: MessagesSquare,
     preview: <SimulatorPreview />,
-    wide: true,
   },
   {
-    title: "Storyboard Studio",
-    body: "Build pyramid storylines and action titles, with coaching before the deck is due.",
+    title: "Build storylines",
+    body: "Turn a case pack into a pyramid and a ghost deck, then get a coach review and a score before the real deck is due.",
     Icon: Presentation,
-    preview: <PyramidPreview />,
+    preview: <StorylinePreview />,
   },
   {
-    title: "SteerCo Rehearsal",
-    body: "Present to a simulated steering committee and field the hard questions in the room.",
-    Icon: Timer,
-    preview: <SteerCoPreview />,
-  },
-  {
-    title: "Partner Red Pen",
-    body: "Submit a draft and get partner-grade margin notes on structure, logic and the so-what.",
+    title: "Get a partner review",
+    body: "Paste in a deliverable and get it back marked up the way a partner would: structure, logic and the so-what.",
     Icon: Highlighter,
     preview: <RedPenPreview />,
-    wide: true,
   },
   {
-    title: "Learn tracks",
-    body: "Short lessons on the frameworks and habits each level is assessed on.",
-    Icon: GraduationCap,
-    preview: <LearnPreview />,
-    wide: true,
-  },
-  {
-    title: "Progress & readiness",
-    body: "Readiness by competency, so you know exactly what stands between you and the next level.",
+    title: "Track readiness",
+    body: "See how ready you are for the next level, competency by competency, and what to practise next.",
     Icon: Route,
     preview: <ProgressPreview />,
   },
 ];
 
-export function Features({ ctaHref }: { ctaHref: string }) {
+export function Features() {
   return (
-    <section aria-labelledby="features-title" id="features" className="scroll-mt-24 py-20 sm:py-28">
+    <section aria-labelledby="features-title" id="features" className="scroll-mt-24 py-24 sm:py-32">
       <div className={CONTAINER}>
         <SectionHeading
           id="features-title"
-          eyebrow="AI-powered coaching"
-          eyebrowIcon={<Sparkles size={14} aria-hidden />}
-          first="Everything you need to"
-          second="earn the next promotion"
-          lede="Six tools built around the moments that decide careers in consulting: the tough client call, the storyline, the SteerCo and the review."
+          eyebrow="What you can do"
+          first="Four ways to get better"
+          second="at the work that counts"
+          lede="Each one covers a single part of the job. Start with whichever matters most this week."
         />
 
-        <ul className="m-0 mt-14 grid list-none grid-cols-1 gap-5 p-0 md:grid-cols-2 lg:grid-cols-3">
+        <ul className="m-0 mt-16 grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 lg:gap-8">
           {FEATURES.map((f) => (
-            <li key={f.title} className={`${CARD} ${LIFT} flex flex-col gap-5 p-4 sm:p-5 ${f.wide ? "lg:col-span-2" : ""}`}>
+            <li key={f.title} className={`${CARD} ${LIFT} flex flex-col gap-6 p-4 sm:p-5`}>
               <div aria-hidden className="relative h-44 overflow-hidden rounded-xl bg-subtle ring-1 ring-border">
                 {f.preview}
               </div>
-              <div className="flex flex-1 flex-col gap-2 px-1 pb-1">
+              <div className="flex flex-col gap-2 px-1 pb-2">
                 <div className="flex items-center gap-3">
-                  <span aria-hidden className="flex h-9 w-9 items-center justify-center rounded-md bg-primary-tint text-primary">
+                  <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary-tint text-primary">
                     <f.Icon size={18} />
                   </span>
                   <h3 className="m-0 font-display text-xl font-semibold tracking-tight text-ink">{f.title}</h3>
                 </div>
                 <p className="m-0 text-[15px] leading-relaxed text-muted">{f.body}</p>
-                <ArrowLink href={ctaHref} className="mt-auto self-start pt-2">
-                  Try it free<span className="sr-only">: {f.title}</span>
-                </ArrowLink>
               </div>
             </li>
           ))}
         </ul>
+
+        <p className="mx-auto mt-12 mb-0 max-w-2xl text-center text-[15px] leading-relaxed text-pretty text-ink-2">
+          <GraduationCap size={18} aria-hidden className="mr-2 inline-block align-[-3px] text-primary" />
+          <span className="font-semibold text-ink">Plus short lessons in Learn,</span> including a client leadership &amp; business development track
+          for client directors and anyone who sells services.
+        </p>
       </div>
     </section>
   );
@@ -104,14 +91,13 @@ function SimulatorPreview() {
         <Chip tone="success">
           <Check size={12} strokeWidth={3} /> Options offered
         </Chip>
-        <Chip tone="primary">Mood: warming</Chip>
-        <Chip tone="muted">Scope creep</Chip>
+        <Chip tone="primary">Score 4/5</Chip>
       </div>
     </div>
   );
 }
 
-function PyramidPreview() {
+function StorylinePreview() {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-2 p-4">
       <div className="w-[62%] rounded-md bg-primary px-2 py-1.5 text-center text-[11px] font-semibold text-on-primary shadow-sm">
@@ -125,34 +111,11 @@ function PyramidPreview() {
           </div>
         ))}
       </div>
+      {/* Ghost deck: one thumbnail per slide, with the one the coach flagged highlighted. */}
       <div className="grid w-full grid-cols-6 gap-1">
         {Array.from({ length: 6 }, (_, i) => (
           <div key={i} className={`h-4 rounded-[4px] ${i === 4 ? "bg-accent-tint ring-1 ring-accent" : "bg-border"}`} />
         ))}
-      </div>
-    </div>
-  );
-}
-
-function SteerCoPreview() {
-  return (
-    <div className="flex h-full flex-col gap-2.5 p-4">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] font-semibold text-ink-2">Slide 3 of 5</span>
-        <span className="tabular inline-flex items-center gap-1 rounded-full bg-surface px-2 py-0.5 text-[11px] font-semibold text-ink shadow-sm ring-1 ring-border">
-          <Timer size={11} /> 02:41
-        </span>
-      </div>
-      <div className="flex flex-1 flex-col gap-1.5 rounded-md bg-surface p-2.5 shadow-sm ring-1 ring-border">
-        <div className="h-2 w-3/4 rounded-full bg-ink-2/70" />
-        <div className="mt-1 flex flex-1 items-end gap-1.5">
-          {[40, 62, 50, 78, 90].map((h, i) => (
-            <div key={i} className="flex-1 rounded-t-[3px] bg-primary/70" style={{ height: `${h}%` }} />
-          ))}
-        </div>
-      </div>
-      <div className="rounded-md bg-accent-tint px-2.5 py-1.5 text-[11px] leading-snug text-accent-ink">
-        <span className="font-semibold">CFO:</span> What does a month&apos;s delay cost us?
       </div>
     </div>
   );
@@ -165,50 +128,21 @@ function RedPenPreview() {
         <span className="font-semibold text-ink">Executive summary</span>
         <p className="m-0">
           <span className="text-muted line-through decoration-danger decoration-2">We have reviewed a number of options across the estate and</span>{" "}
-          <span className="rounded-[3px] bg-danger-tint px-0.5 text-ink">Consolidating to one data platform saves £2.4m a year.</span>
+          <span className="rounded-[3px] bg-danger-tint px-0.5 text-ink">One data platform cuts run costs by a third.</span>
         </p>
         <div className="flex flex-col gap-1.5">
           <div className="h-1.5 w-full rounded-full bg-border" />
           <div className="h-1.5 w-4/5 rounded-full bg-border" />
         </div>
       </div>
-      <div className="hidden w-40 shrink-0 flex-col gap-2 min-[420px]:flex">
+      <div className="hidden w-36 shrink-0 flex-col gap-2 min-[420px]:flex">
         <div className="rounded-md border-l-[3px] border-danger bg-surface px-2.5 py-2 text-[11.5px] leading-snug text-ink shadow-sm">
           <span className="font-semibold text-danger">So what?</span> Lead with the answer, not the process.
         </div>
         <div className="rounded-md border-l-[3px] border-danger bg-surface px-2.5 py-2 text-[11.5px] leading-snug text-ink shadow-sm">
-          <span className="font-semibold text-danger">Evidence</span> Source the £2.4m.
+          <span className="font-semibold text-danger">Evidence</span> Source the saving.
         </div>
       </div>
-    </div>
-  );
-}
-
-function LearnPreview() {
-  const rows = [
-    { t: "Hypothesis-led problem solving", done: 4, of: 6 },
-    { t: "Managing senior stakeholders", done: 2, of: 5 },
-    { t: "Writing action titles", done: 5, of: 5 },
-  ];
-  return (
-    <div className="flex h-full flex-col justify-center gap-2 p-4 sm:px-6">
-      {rows.map((r) => (
-        <div key={r.t} className="flex items-center gap-3 rounded-md bg-surface px-3 py-2 shadow-sm ring-1 ring-border">
-          <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink">{r.t}</span>
-          <div className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-primary-tint min-[420px]:block">
-            <div className="h-full rounded-full bg-primary" style={{ width: `${(r.done / r.of) * 100}%` }} />
-          </div>
-          {r.done === r.of ? (
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-success text-white">
-              <Check size={12} strokeWidth={3} />
-            </span>
-          ) : (
-            <span className="tabular text-[11px] font-semibold text-muted">
-              {r.done}/{r.of}
-            </span>
-          )}
-        </div>
-      ))}
     </div>
   );
 }
@@ -239,11 +173,10 @@ function ProgressPreview() {
   );
 }
 
-function Chip({ tone, children }: { tone: "success" | "primary" | "muted"; children: ReactNode }) {
+function Chip({ tone, children }: { tone: "success" | "primary"; children: ReactNode }) {
   const cls = {
     success: "bg-success-tint text-success",
     primary: "bg-primary-tint text-primary",
-    muted: "bg-surface text-muted ring-1 ring-border",
   }[tone];
   return <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${cls}`}>{children}</span>;
 }

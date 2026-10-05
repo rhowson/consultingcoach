@@ -1,4 +1,5 @@
 import type { FeedbackMoment } from "@/lib/types";
+import { Card } from "@/components/ui/card";
 import { RetrySimButton } from "./retry-button";
 
 /** MomentCard: what you said, why it mattered, and what to try instead. */
@@ -9,16 +10,16 @@ export function MomentCard({
   attemptId,
 }: {
   moment: FeedbackMoment;
-  mode: "simulation" | "storyboard" | "rehearsal" | "diagnostic";
+  mode: string;
   scenarioId: string;
   attemptId: string;
 }) {
   const turn = /^\d+$/.test(moment.ref.trim()) ? Number(moment.ref) : null;
   const canRetry = mode === "simulation" && turn != null;
-  const where = mode === "simulation" || mode === "diagnostic" ? (turn != null ? `Turn ${turn} · You said` : "You said") : "In your storyboard";
+  const where = mode === "storyboard" ? "In your storyboard" : turn != null ? `Turn ${turn} · You said` : "You said";
 
   return (
-    <article className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-5 md:p-6">
+    <Card className="flex flex-col gap-4 p-5 md:p-6">
       <span className="tabular text-xs text-muted">{where}</span>
       <blockquote className="m-0 font-serif text-lg leading-snug font-semibold text-ink">“{moment.quote}”</blockquote>
       <p className="m-0 text-[15px] text-ink-2">{moment.annotation}</p>
@@ -29,12 +30,12 @@ export function MomentCard({
         </div>
       )}
       {canRetry && (
-        <div>
+        <div className="print:hidden">
           <RetrySimButton scenarioId={scenarioId} retryOf={attemptId} fromTurn={turn}>
             Retry this moment
           </RetrySimButton>
         </div>
       )}
-    </article>
+    </Card>
   );
 }

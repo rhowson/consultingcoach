@@ -207,7 +207,7 @@ export function StudioEditor({ storyboard: sb }: { storyboard: Storyboard }) {
   async function leave() {
     setLeaving(true);
     await flush();
-    router.push("/studio");
+    router.push("/practice?tab=storylines");
   }
 
   async function submit() {
@@ -232,7 +232,7 @@ export function StudioEditor({ storyboard: sb }: { storyboard: Storyboard }) {
 
   return (
     <div className="relative flex h-dvh flex-col overflow-hidden bg-bg">
-      <SessionHeader title={sb.case.title} subtitle={`Storyboard Studio · ${pack.client}`} onExit={() => setExitOpen(true)}>
+      <SessionHeader title={sb.case.title} subtitle={`Storyline · ${pack.client}`} onExit={() => setExitOpen(true)}>
         <span aria-label="Time elapsed" className="tabular hidden items-center gap-1.5 text-sm whitespace-nowrap text-ink-2 md:flex">
           <Clock size={16} className="text-muted" aria-hidden />
           {fmtClock(elapsed)}
@@ -478,13 +478,8 @@ export function SubmittedStoryboard({ storyboard: sb }: { storyboard: Storyboard
   const pyramid = sb.pyramid ?? emptyPyramid();
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-bg">
-      <SessionHeader title={sb.case.title} subtitle={`Storyboard Studio · ${pack.client} · Submitted`} onExit={() => router.push("/studio")}>
+      <SessionHeader title={sb.case.title} subtitle={`Storyline · ${pack.client} · Submitted`} onExit={() => router.push("/practice?tab=storylines")}>
         <TargetPill level={sb.case.targetLevel} />
-        <span className="hidden sm:flex">
-          <Link href={`/rehearsal/${sb.id}`} className={buttonClass("secondary", "md")}>
-            Rehearse this deck
-          </Link>
-        </span>
         <Link href={`/feedback/${sb.attemptId}`} className={buttonClass("primary", "md")}>
           <span className="sm:hidden">Feedback</span>
           <span className="hidden sm:inline">View feedback</span>
@@ -497,13 +492,7 @@ export function SubmittedStoryboard({ storyboard: sb }: { storyboard: Storyboard
         <main className="min-w-0 flex-1 overflow-y-auto px-4 pt-6 pb-12 md:px-8">
           <div role="note" className="mx-auto mb-6 flex max-w-[960px] flex-wrap items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 text-sm">
             <Check size={18} className="flex-none text-success" aria-hidden />
-            <span className="min-w-[200px] flex-1">This storyboard has been submitted and scored. It&apos;s read-only now.</span>
-            <Link href={`/feedback/${sb.attemptId}`} className="font-semibold text-primary hover:underline">
-              See your feedback
-            </Link>
-            <Link href={`/rehearsal/${sb.id}`} className="font-semibold text-primary hover:underline">
-              Rehearse at SteerCo
-            </Link>
+            <span className="min-w-[200px] flex-1">Submitted and scored. This storyboard is read-only now.</span>
           </div>
           <div className="mx-auto mb-8 flex max-w-[960px] flex-col gap-2">
             <h2 className="eyebrow m-0">Title read-through</h2>

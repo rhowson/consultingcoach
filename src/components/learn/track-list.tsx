@@ -1,13 +1,8 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import { BookOpen, Briefcase, Check, ChevronRight, Clock, GraduationCap } from "lucide-react";
-import { BUSINESS_DEVELOPMENT_TRACK_IDS } from "@/lib/learn-groups";
-import { COMPETENCIES, COMPETENCY_LABELS, LEVEL_LABELS, type Competency, type Level } from "@/lib/competency";
+import { BookOpen, Briefcase, Check, ChevronRight, ClipboardList, Clock, GraduationCap } from "lucide-react";
+import { BUSINESS_DEVELOPMENT_TRACK_IDS, ENGAGEMENT_TRACK_IDS } from "@/lib/learn-groups";
+import { LEVEL_LABELS, type Competency, type Level } from "@/lib/competency";
 import { Card } from "@/components/ui/card";
-import { CompetencyChip } from "@/components/ui/badges";
-import { CompetencyIcon } from "@/components/ui/icons";
 
 interface TrackLesson {
   id: string;
@@ -27,15 +22,20 @@ export interface TrackData {
   lessons: TrackLesson[];
 }
 
-type Filter = Competency | "all" | "bd";
-
 const GROUPS = [
   {
     id: "core",
     title: "Core consulting skills",
     description: "Problem solving, storylining, outputs and client conversations, from Analyst up.",
     Icon: GraduationCap,
-    match: (t: TrackData) => !BUSINESS_DEVELOPMENT_TRACK_IDS.includes(t.id),
+    match: (t: TrackData) => !ENGAGEMENT_TRACK_IDS.includes(t.id) && !BUSINESS_DEVELOPMENT_TRACK_IDS.includes(t.id),
+  },
+  {
+    id: "engagements",
+    title: "Running engagements",
+    description: "Set up, staff and run an engagement end to end, from signed proposal to handover.",
+    Icon: ClipboardList,
+    match: (t: TrackData) => ENGAGEMENT_TRACK_IDS.includes(t.id),
   },
   {
     id: "bd",
@@ -47,11 +47,6 @@ const GROUPS = [
 ] as const;
 
 export function TrackList({ tracks }: { tracks: TrackData[] }) {
-  const [filter, setFilter] = useState<Filter>("all");
-  const present = COMPETENCIES.filter((c) => tracks.some((t) => t.competency === c));
-  const shown = filter === "all" ? tracks : filter === "bd" ? tracks.filter(GROUPS[1].match) : tracks.filter((t) => t.competency === filter);
-  const hasBd = tracks.some(GROUPS[1].match);
-
   if (tracks.length === 0) {
     return (
       <Card className="flex items-center gap-3 p-6 text-sm text-muted">
@@ -61,31 +56,13 @@ export function TrackList({ tracks }: { tracks: TrackData[] }) {
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <div role="group" aria-label="Filter by competency" className="flex flex-wrap gap-2">
-        <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
-          All tracks
-        </FilterChip>
-        {hasBd && (
-          <FilterChip active={filter === "bd"} onClick={() => setFilter("bd")}>
-            <Briefcase size={14} aria-hidden />
-            Business development
-          </FilterChip>
-        )}
-        {present.map((c) => (
-          <FilterChip key={c} active={filter === c} onClick={() => setFilter(c)}>
-            <CompetencyIcon competency={c} size={14} />
-            {COMPETENCY_LABELS[c]}
-          </FilterChip>
-        ))}
-      </div>
-
+    <div className="flex flex-col gap-10">
       {GROUPS.map((g) => {
-        const items = shown.filter(g.match);
+        const items = tracks.filter(g.match);
         if (!items.length) return null;
         return (
           <section key={g.id} aria-labelledby={`group-${g.id}`} className="flex flex-col gap-4">
-            <div className="flex items-start gap-3 pt-2">
+            <div className="flex items-start gap-3">
               <span className="flex h-10 w-10 flex-none items-center justify-center rounded-md bg-primary-tint text-primary">
                 <g.Icon size={20} aria-hidden />
               </span>
@@ -108,36 +85,20 @@ export function TrackList({ tracks }: { tracks: TrackData[] }) {
   );
 }
 
-function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={`inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition-colors ${
-        active ? "border-primary bg-primary text-on-primary" : "border-border bg-surface text-ink-2 hover:bg-hover"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
 function TrackCard({ track: t }: { track: TrackData }) {
   const pct = t.lessonCount ? t.completedCount / t.lessonCount : 0;
   const nextId = t.lessons.find((l) => !l.completed)?.id;
   return (
     <Card aria-labelledby={`track-${t.id}`} className="flex flex-col gap-4 p-6">
       <div className="flex items-start gap-4">
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <CompetencyChip competency={t.competency} />
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <h3 id={`track-${t.id}`} className="m-0 font-serif text-xl leading-snug font-semibold">
             {t.title}
           </h3>
+          <p className="m-0 text-sm text-ink-2">{t.description}</p>
         </div>
         <ProgressRing value={pct} label={`${t.completedCount} of ${t.lessonCount} lessons complete`} />
       </div>
-      <p className="m-0 text-sm text-ink-2">{t.description}</p>
       <div className="flex flex-wrap items-center gap-4 text-[13px] text-muted">
         <span className="flex items-center gap-1.5">
           <BookOpen size={15} aria-hidden />
@@ -146,9 +107,6 @@ function TrackCard({ track: t }: { track: TrackData }) {
         <span className="flex items-center gap-1.5">
           <Clock size={15} aria-hidden />
           {t.durationMin} min
-        </span>
-        <span className="tabular">
-          {t.completedCount}/{t.lessonCount} done
         </span>
       </div>
       <ol className="m-0 flex list-none flex-col border-t border-border p-0">
@@ -159,7 +117,7 @@ function TrackCard({ track: t }: { track: TrackData }) {
               className="flex items-center gap-3 rounded-md py-2.5 text-ink no-underline hover:bg-subtle"
             >
               <span
-                className={`flex h-5 w-5 flex-none items-center justify-center rounded-full text-white ${
+                className={`flex h-5 w-5 flex-none items-center justify-center rounded-full text-on-primary ${
                   l.completed ? "border border-success bg-success" : "border-[1.5px] border-border-strong bg-surface"
                 }`}
               >

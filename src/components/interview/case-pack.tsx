@@ -155,7 +155,7 @@ function ExhibitView({ exhibit }: { exhibit: CaseExhibit }) {
   const numeric = (c: string) => /^[£$€]?[-–+]?[\d.,]+%?(m|bn|k)?$/.test(c) || c === "–" || c === "";
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-surface">
+    <div className="relative overflow-x-auto rounded-lg border border-border bg-surface">
       <table className="w-full border-collapse text-[13px]">
         <caption className="border-b border-border px-3 py-2.5 text-left text-sm font-semibold">{caption}</caption>
         <thead>

@@ -404,6 +404,38 @@ export const scenarios: Scenario[] = [
     maxTurns: 10,
   },
 
+  {
+    id: "start-on-monday",
+    kind: "simulation",
+    practiceArea: "programme_delivery",
+    title: "Start on Monday",
+    summary: "The client sponsor wants your team on site on Monday. The statement of work isn't signed and your associate's vetting isn't back.",
+    personaId: "rebecca-lane",
+    rubricId: "client-management",
+    targetLevel: "manager",
+    difficulty: 2,
+    durationMin: 15,
+    competencies: ["client_management", "difficult_conversations"],
+    briefing: {
+      situation:
+        "Ashdown Borough Council has chosen your firm for a 12-week digital transformation discovery. Rebecca Lane, the Chief Transformation Officer, wants the team on site on Monday because her Chief Executive has promised councillors an update in six weeks. The statement of work is still with the council's legal team, and the BPSS check for your associate data lead won't be back for about ten days.",
+      yourRole: "Engagement manager responsible for mobilising the team.",
+      objective: "Keep Rebecca's confidence while agreeing a safe start: what can begin on Monday, what waits for the contract and vetting, and how you'll still hit her six-week date.",
+      whatGoodLooksLike: {
+        consultant: "Explains the constraints calmly and clearly, without hiding behind process.",
+        manager: "Proposes a phased start (planning and stakeholder interviews from Monday; data work once vetting clears), offers to help unblock legal, and agrees a dated plan that protects the six-week update.",
+        director: "Also presents the controls as protecting Rebecca and the council, gets her to escalate the contract with legal, and agrees an interim basis to start, such as a letter of intent.",
+      },
+    },
+    objectives: [
+      { id: "constraints", label: "Explained what's blocking a full start" },
+      { id: "phased", label: "Offered a phased start that keeps momentum" },
+      { id: "agreed", label: "Agreed a dated plan and who unblocks what" },
+    ],
+    openingLine: "I'll be blunt. My Chief Exec has promised members an update in six weeks. I need your team in this building on Monday, so tell me that's happening.",
+    maxTurns: 10,
+  },
+
   // ---------- Storyboard cases ----------
   {
     id: "meridian-data-platform",

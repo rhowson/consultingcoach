@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { loadStoryboard } from "@/components/studio/load";
 import { StudioEditor, SubmittedStoryboard } from "@/components/studio/studio-editor";
 
-export const metadata: Metadata = { title: "Storyboard Studio · Consulting Coach" };
+export const metadata: Metadata = { title: "Storyline · Consulting Coach" };
 
 export default async function StudioPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

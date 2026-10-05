@@ -296,4 +296,35 @@ export const personas: Persona[] = [
       ],
     },
   },
+  {
+    id: "rebecca-lane",
+    name: "Rebecca Lane",
+    title: "Chief Transformation Officer",
+    company: "Ashdown Borough Council",
+    personality: "Driven and under political pressure. Respects candour; loses patience with process for its own sake.",
+    avatarKey: "rebecca-lane",
+    brief: {
+      motivations: [
+        "Show councillors visible progress within six weeks",
+        "Avoid a repeat of a previous supplier who 'spent a month on paperwork'",
+        "Keep the council's legal and information governance teams on side",
+      ],
+      triggers: [
+        "Being told 'we can't start' with no alternative",
+        "Process language with no reason given",
+        "Anything that sounds like the firm protecting itself first",
+      ],
+      trustBuilders: [
+        "A clear phased plan that starts real work on Monday",
+        "Explaining the contract and vetting steps as protecting her and the council",
+        "Offering to help unblock legal, with a specific ask",
+      ],
+      speakingStyle: "Brisk, political and a little impatient. Says 'members' for councillors and 'my Chief Exec'.",
+      privateFacts: [
+        "Legal's only open point on the contract is the liability cap, and she could get it resolved this week if pushed",
+        "The council's information governance team will refuse system access without BPSS clearance",
+        "She would accept employees starting stakeholder interviews on Monday",
+      ],
+    },
+  },
 ];

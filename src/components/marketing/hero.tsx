@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Building2, Target, Zap } from "lucide-react";
+import { ArrowRight, Target } from "lucide-react";
 import type { ReactNode } from "react";
 import { AppPreview, ReadinessRing } from "./app-preview";
 import { CONTAINER, SKY_PRIMARY } from "./primitives";
@@ -30,8 +30,8 @@ export function Hero({ primaryHref, primaryLabel }: { primaryHref: string; prima
         </h1>
 
         <p className="mt-6 mb-0 max-w-2xl text-[17px] leading-relaxed text-pretty text-white/95 [text-shadow:0_1px_12px_rgba(10,40,80,0.3)] sm:text-lg">
-          Practise difficult client conversations, sharpen your storylines and rehearse SteerCo delivery with an AI coach that scores every rep
-          against the level you&apos;re aiming for, from Analyst to Director.
+          Practise difficult client conversations, build sharper storylines and get partner-grade feedback on your work, with an AI coach that
+          scores you against the level you&apos;re aiming for, from Analyst to Director.
         </p>
 
         <div className="mt-9 flex flex-col items-center gap-5 sm:flex-row sm:gap-7">
@@ -52,21 +52,14 @@ export function Hero({ primaryHref, primaryLabel }: { primaryHref: string; prima
           <AppPreview />
 
           <ul className="m-0 mt-5 grid list-none grid-cols-1 gap-3 p-0 min-[400px]:grid-cols-2 xl:contents">
-            <Callout className="xl:absolute xl:top-10 xl:-left-64" icon={<IconChip><Zap size={16} /></IconChip>} title="Live feedback on every turn" sub="See what landed, and why" />
             <Callout
-              className="xl:absolute xl:top-24 xl:-right-64"
+              className="xl:absolute xl:top-16 xl:-left-64"
               icon={<IconChip><Target size={16} /></IconChip>}
               title="Scored against your target level"
               sub="Analyst to Director rubrics"
             />
             <Callout
-              className="xl:absolute xl:bottom-24 xl:-left-64"
-              icon={<IconChip><Building2 size={16} /></IconChip>}
-              title="UK tech & transformation cases"
-              sub="ERP, data, operating model"
-            />
-            <Callout
-              className="xl:absolute xl:bottom-6 xl:-right-64"
+              className="xl:absolute xl:bottom-16 xl:-right-64"
               icon={
                 <span className="relative flex items-center justify-center">
                   <ReadinessRing percent={72} size={40} stroke={4.5} />

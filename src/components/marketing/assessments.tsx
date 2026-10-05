@@ -11,7 +11,7 @@ const DIMENSIONS = [
 
 export function Assessments() {
   return (
-    <section aria-labelledby="assessments-title" id="assessments" className="scroll-mt-24 border-y border-border bg-surface py-20 sm:py-28">
+    <section aria-labelledby="assessments-title" id="assessments" className="scroll-mt-24 border-y border-border bg-surface py-24 sm:py-32">
       <div className={`${CONTAINER} grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16`}>
         <div className="flex flex-col gap-8">
           <SectionHeading
@@ -20,14 +20,13 @@ export function Assessments() {
             eyebrow="Interview assessments for firms"
             first="Hire for judgement,"
             second="not just polish"
-            lede="Run a timed, realistic case with an AI assistant at the candidate's side, and get an evidence-backed report your assessors can discuss."
+            lede="Run a timed case with an AI assistant at the candidate's side, then get an evidence-based report your assessors can discuss."
           />
           <ul className="m-0 flex list-none flex-col gap-5 p-0">
-            <CheckItem title="60-minute timed case">A realistic brief, data pack and client conversation.</CheckItem>
-            <CheckItem title="Scored with evidence">Critical thinking, communication and AI fluency, each backed by quotes from the session.</CheckItem>
-            <CheckItem title="Guardrailed AI assistant">It helps candidates think and work faster, but it can&apos;t write the answer.</CheckItem>
-            <CheckItem title="Planted-error detection">See who checks the numbers before they present them.</CheckItem>
-            <CheckItem title="Integrity signals for discussion">Flags for assessors to explore, never automatic verdicts.</CheckItem>
+            <CheckItem title="A timed, realistic case">60 minutes with a brief, a data pack and a client conversation.</CheckItem>
+            <CheckItem title="A guardrailed AI assistant">It helps candidates think and work faster, but it can&apos;t write the answer.</CheckItem>
+            <CheckItem title="A planted error">See who checks the numbers before they present them.</CheckItem>
+            <CheckItem title="Integrity signals">Flags for assessors to explore, never automatic verdicts.</CheckItem>
           </ul>
           <ButtonLink href="/signup" size="lg" className="group self-start">
             Talk to us about assessments

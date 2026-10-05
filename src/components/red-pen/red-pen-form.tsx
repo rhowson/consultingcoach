@@ -95,8 +95,7 @@ export function RedPenForm({ defaultLevel }: { defaultLevel: Level }) {
         </label>
         <p id="rp-hint" className="m-0 flex items-start gap-1.5 text-[13px] text-muted">
           <Info size={15} className="mt-0.5 flex-none" aria-hidden />
-          File upload isn&apos;t supported yet — copy the slide titles and body text in order. Remove client names and anything else that identifies
-          the client first.
+          Copy the slide titles and body text in order. Remove client names and anything else that identifies the client.
         </p>
         <textarea
           id="rp-content"

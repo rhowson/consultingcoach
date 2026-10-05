@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useId, useState } from "react";
-import { BookOpen, Check, ChevronDown, ChevronRight, MessagesSquare, PanelsTopLeft, Presentation, Target } from "lucide-react";
+import { BookOpen, Check, ChevronDown, ChevronRight, MessagesSquare, PanelsTopLeft, Target } from "lucide-react";
 
 interface Item {
   kind: "lesson" | "scenario";
@@ -19,8 +19,8 @@ interface Week {
   items: Item[];
 }
 
-const PREFIX: Record<string, string> = { lesson: "Lesson", simulation: "Sim", storyboard: "Studio", rehearsal: "Rehearsal" };
-const ICON = { lesson: BookOpen, simulation: MessagesSquare, storyboard: PanelsTopLeft, rehearsal: Presentation } as const;
+const PREFIX: Record<string, string> = { lesson: "Lesson", simulation: "Conversation", storyboard: "Storyline" };
+const ICON = { lesson: BookOpen, simulation: MessagesSquare, storyboard: PanelsTopLeft } as const;
 
 export function PlanAccordion({ weeks, currentWeek }: { weeks: Week[]; currentWeek: number | null }) {
   const [open, setOpen] = useState<number | null>(currentWeek ?? weeks[0]?.week ?? null);

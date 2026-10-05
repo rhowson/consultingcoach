@@ -270,7 +270,7 @@ export function IntegrityPanel({ pack, sections, result, events }: { pack: Pack;
         {started.length > 0 && (
           <div className="flex flex-col gap-2">
             <h3 className="m-0 text-[15px] font-semibold">By section</h3>
-            <div className="overflow-x-auto">
+            <div className="relative overflow-x-auto">
               <table className="w-full min-w-[460px] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-border text-xs text-muted">

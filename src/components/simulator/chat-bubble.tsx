@@ -26,7 +26,8 @@ export function PersonaBubble({ persona, time, children }: { persona: PersonaInf
         <div className="flex flex-wrap items-baseline gap-x-2 text-[13px]">
           <span className="font-semibold">{persona.name}</span>
           <span className="text-muted">
-            {persona.title}, {persona.company}
+            {persona.title}
+            {persona.company ? `, ${persona.company}` : ""}
           </span>
           {time && <span className="tabular text-xs text-muted">{time}</span>}
         </div>

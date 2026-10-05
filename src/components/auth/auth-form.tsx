@@ -55,7 +55,7 @@ export function AuthForm({ mode, requiresAccessCode = false }: { mode: "login" |
               <p className="m-0 text-[16px] leading-relaxed text-ink-2">
                 {mode === "login"
                   ? "Pick up your development plan where you left off."
-                  : "Practise client conversations, storylines and SteerCo delivery with an AI coach."}
+                  : "Practise client conversations, build storylines and get partner reviews with an AI coach."}
               </p>
             </div>
 
@@ -154,7 +154,7 @@ function SkyPanel() {
         <div aria-hidden className="flex max-w-md flex-col gap-4">
           <div className="glass rounded-xl p-5 shadow-lg">
             <div className="flex items-center justify-between gap-3">
-              <span className="eyebrow">Last rep · SteerCo Rehearsal</span>
+              <span className="eyebrow">Last rep · Client Simulator</span>
               <span className="rounded-full bg-success-tint px-2 py-0.5 text-[11px] font-semibold text-success">Meets bar</span>
             </div>
             <div className="mt-3 flex items-end gap-4">

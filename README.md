@@ -4,22 +4,17 @@ An AI coaching app that trains consultants from Analyst to Director. Users pract
 
 The front end is built from the Claude Design project (tokens, Home, Client Simulator, Storyboard Studio, SteerCo Rehearsal) and the [front-end spec](https://claude.ai/code/artifact/8ab7cfd6-b1f5-43a4-822e-cacfff7f0c38), on top of the JSON API in `src/app/api`.
 
-| Screen | Route |
-| --- | --- |
-| Login / signup (with demo sign-in) | `/login`, `/signup` |
-| Onboarding diagnostic | `/onboarding` |
-| Home dashboard | `/` |
-| Learn (tracks, lessons, quizzes) | `/learn`, `/learn/:id` |
-| Practice hub + briefing drawer | `/practice` |
-| Client Simulator | `/practice/sim/:attemptId` |
-| Feedback report | `/feedback/:attemptId` |
-| Storyboard Studio | `/studio`, `/studio/:id` |
-| SteerCo Rehearsal | `/rehearsal/:storyboardId` |
-| Partner Red Pen | `/red-pen`, `/red-pen/:id` |
-| Progress | `/progress` |
-| Settings | `/settings` |
-| Interview assessments (assessors) | `/assess`, `/assess/:id` |
-| Timed interview (candidates, by link) | `/interview/:token` |
+The app is organised around five jobs, one per sidebar item:
+
+| Job | Route | What it's for |
+| --- | --- | --- |
+| Home | `/` | Where you are and the one thing to do next |
+| Practice | `/practice` | Client conversations (`/practice/sim/:id`) and storylines (`/studio/:id`), each ending in a feedback report (`/feedback/:id`) |
+| Learn | `/learn` | Short lessons, including a client leadership & business development group |
+| Review | `/red-pen` | Paste a real deliverable and get a partner's mark-up |
+| Progress | `/progress` | Readiness by competency, your plan, trend and history |
+
+Assessors also see **Assessments** (`/assess`). Candidates take interviews at `/interview/:token`. Settings are under the avatar. Logged-out visitors see the landing page at `/welcome`; sign-in is at `/login` and `/signup`.
 
 ## Stack
 
@@ -68,9 +63,10 @@ Scenarios are UK technology and transformation engagements, priced in £, tagged
 | Programme delivery | Green on the outside (Programme Director, Manager); While you're here… (Director of Digital, Consultant) | – |
 | Change & culture | The leaked operating model (Director of Housing Operations, Manager) | – |
 | Commercial advisory & decision support | Your benefits case is wrong (CFO, Consultant); The 10-minute CEO (Chief Executive, Director) | Calder Water: renew, re-tender or insource IT services? (Manager) |
+| Programme delivery: engagement set-up | Start on Monday (Chief Transformation Officer, Manager) | – |
 | Business development | First meeting with a new CIO (Manager); Procurement wants 20% off (Head of Procurement, Director); Earn the follow-on (COO, Director) | – |
 
-Learn has a separate **Client leadership & business development** group for client directors and people who sell services, with four tracks: Account Leadership, Winning Work, Commercial Conversations and Trusted Advisor (`BUSINESS_DEVELOPMENT_TRACK_IDS` in `src/lib/learn-groups.ts`). Business development scenarios use their own rubric: discovery, value framing, commercial judgement and advancing the opportunity.
+Learn has a **Running engagements** group with a six-lesson track, Setting Up an Engagement: scope and the SOW, staffing and selecting associates, contracting and onboarding associates (IR35, BPSS, conflicts, data), governance and kick-off, commercials and margin, and close and handover. Learn also has a separate **Client leadership & business development** group for client directors and people who sell services, with four tracks: Account Leadership, Winning Work, Commercial Conversations and Trusted Advisor (`BUSINESS_DEVELOPMENT_TRACK_IDS` in `src/lib/learn-groups.ts`). Business development scenarios use their own rubric: discovery, value framing, commercial judgement and advancing the opportunity.
 
 Retired scenarios (`retiredScenarioIds`) stay in the database so old reports still work, but are hidden from the catalogue.
 
@@ -149,7 +145,10 @@ Deploy-on-push needs the Railway GitHub App installed on the repository.
 
 ## Not built yet
 
-- SteerCo Rehearsal questions are scripted client-side and not scored yet
+These are deliberately hidden from the interface until they're finished:
+
+- SteerCo Rehearsal: its questions are scripted in the browser and not scored. The `/rehearsal/:id` route still exists but nothing links to it.
+- Voice mode
 - Pro plan / billing
-- File parsing for Red Pen uploads (the API takes plain text for now)
-- Voice mode and the B2B team dashboard
+- File upload for Red Pen (it takes pasted text for now)
+- A team dashboard for firms

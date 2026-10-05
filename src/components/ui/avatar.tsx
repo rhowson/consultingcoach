@@ -12,6 +12,7 @@ const PERSONA_BG: Record<string, string> = {
   "helen-marsh": "#2E5E4E",
   "neil-forsyth": "#5A4A7A",
   "owen-price": "#6B5B3A",
+  "rebecca-lane": "#7A3B4E",
 };
 
 export function initials(name: string) {

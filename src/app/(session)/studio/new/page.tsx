@@ -8,7 +8,7 @@ export default async function NewStoryboardPage({ searchParams }: { searchParams
   const user = await requirePageUser();
   const { case: raw } = await searchParams;
   const caseId = Array.isArray(raw) ? raw[0] : raw;
-  if (!caseId) redirect("/studio");
+  if (!caseId) redirect("/practice?tab=storylines");
 
   let id: string;
   try {

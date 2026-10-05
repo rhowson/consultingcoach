@@ -1,87 +1,73 @@
 "use client";
 
-import { useMemo, useRef, useState, type ComponentProps, type KeyboardEvent } from "react";
-import { ArrowRight, ChevronDown, MessagesSquare, PanelsTopLeft, Presentation, SearchX, X } from "lucide-react";
+import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
+import { MessagesSquare, PanelsTopLeft, SearchX } from "lucide-react";
 import type { Persona, Scenario } from "@/lib/client/api";
-import { COMPETENCIES, COMPETENCY_LABELS, LEVELS, LEVEL_LABELS, type Competency, type Level } from "@/lib/competency";
+import type { Level } from "@/lib/competency";
 import { PRACTICE_AREAS, PRACTICE_AREA_SHORT, type PracticeArea } from "@/lib/practice-areas";
-import { Button, ButtonLink } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
-import { IconChip } from "@/components/ui/icons";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { ScenarioCard } from "./scenario-card";
 import { BriefingDrawer } from "./briefing-drawer";
+import { StorylineList, type HubStoryboard } from "./storyline-list";
 
 export type HubScenario = Scenario & { persona: Persona | null; bestScore: number | null };
 
 const TABS = [
-  { id: "simulation", label: "Client Simulator", Icon: MessagesSquare },
-  { id: "storyboard", label: "Storyboard cases", Icon: PanelsTopLeft },
-  { id: "rehearsal", label: "SteerCo Rehearsal", Icon: Presentation },
+  { id: "conversations", label: "Conversations", Icon: MessagesSquare },
+  { id: "storylines", label: "Storylines", Icon: PanelsTopLeft },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
-const SELECT =
-  "h-10 w-full cursor-pointer appearance-none rounded-full border pr-9 pl-4 text-sm shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary";
-const SELECT_IDLE = "border-border bg-surface text-ink hover:bg-hover";
-const SELECT_ACTIVE = "border-primary/40 bg-primary-tint font-medium text-primary";
-
-/** Native select styled as a pill, with its own chevron. */
-function PillSelect({ id, label, active, children, ...props }: ComponentProps<"select"> & { id: string; label: string; active: boolean }) {
-  return (
-    <span className="relative inline-flex min-w-0 flex-1 sm:flex-none">
-      <label className="sr-only" htmlFor={id}>
-        {label}
-      </label>
-      <select id={id} className={`${SELECT} ${active ? SELECT_ACTIVE : SELECT_IDLE}`} {...props}>
-        {children}
-      </select>
-      <ChevronDown size={16} aria-hidden className={`pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 ${active ? "text-primary" : "text-muted"}`} />
-    </span>
-  );
+/** Updates the query string in place. Passing `null` state lets Next.js sync `useSearchParams` without a server round trip. */
+function editQuery(edit: (q: URLSearchParams) => void) {
+  try {
+    const url = new URL(window.location.href);
+    edit(url.searchParams);
+    window.history.replaceState(null, "", url);
+  } catch {
+    // URL sync is a nicety only.
+  }
 }
+
+const freeFirst = (a: HubScenario, b: HubScenario) => Number(a.isPro) - Number(b.isPro);
 
 export function PracticeHub({
   scenarios,
+  storyboards,
   targetLevel,
-  initialStart,
 }: {
   scenarios: HubScenario[];
+  storyboards: HubStoryboard[];
   targetLevel: Level;
-  initialStart: string | null;
 }) {
-  const startScenario = initialStart ? scenarios.find((s) => s.id === initialStart) : undefined;
-  const [tab, setTab] = useState<Tab>(startScenario?.kind ?? "simulation");
-  const [competency, setCompetency] = useState<Competency | "">("");
-  const [level, setLevel] = useState<Level | "">("");
-  const [area, setArea] = useState<PracticeArea | "">("");
-  const [openId, setOpenId] = useState<string | null>(startScenario?.kind === "simulation" ? startScenario.id : null);
+  const params = useSearchParams();
+  const startId = params.get("start");
+  const startScenario = startId ? scenarios.find((s) => s.id === startId) : undefined;
+  const tabParam = params.get("tab");
+  const tab: Tab = tabParam === "storylines" || (tabParam !== "conversations" && startScenario?.kind === "storyboard") ? "storylines" : "conversations";
+  const open = startScenario?.kind === "simulation" ? startScenario : undefined;
+
+  const [area, setArea] = useState<PracticeArea | null>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const counts = useMemo(() => {
-    const c: Record<Tab, number> = { simulation: 0, storyboard: 0, rehearsal: 0 };
-    for (const s of scenarios) c[s.kind]++;
-    return c;
-  }, [scenarios]);
+  const conversations = scenarios.filter((s) => s.kind === "simulation" && (!area || s.practiceArea === area)).sort(freeFirst);
+  const cases = scenarios.filter((s) => s.kind === "storyboard").sort(freeFirst);
 
-  const visible = scenarios
-    .filter((s) => s.kind === tab)
-    .filter((s) => !competency || s.competencies.includes(competency))
-    .filter((s) => !level || s.targetLevel === level)
-    .filter((s) => !area || s.practiceArea === area)
-    .sort((a, b) => Number(a.isPro) - Number(b.isPro));
-
-  const open = openId ? scenarios.find((s) => s.id === openId) : undefined;
+  function selectTab(next: Tab) {
+    editQuery((q) => {
+      q.delete("start");
+      if (next === "storylines") q.set("tab", next);
+      else q.delete("tab");
+    });
+  }
 
   function setDrawer(id: string | null) {
-    setOpenId(id);
-    try {
-      const url = new URL(window.location.href);
-      if (id) url.searchParams.set("start", id);
-      else url.searchParams.delete("start");
-      window.history.replaceState(window.history.state, "", url);
-    } catch {
-      // URL sync is a nicety only.
-    }
+    editQuery((q) => {
+      if (id) q.set("start", id);
+      else q.delete("start");
+    });
   }
 
   function onTabKey(e: KeyboardEvent, i: number) {
@@ -89,147 +75,121 @@ export function PracticeHub({
       e.key === "ArrowRight" ? (i + 1) % TABS.length : e.key === "ArrowLeft" ? (i - 1 + TABS.length) % TABS.length : e.key === "Home" ? 0 : e.key === "End" ? TABS.length - 1 : -1;
     if (next < 0) return;
     e.preventDefault();
-    setTab(TABS[next].id);
+    selectTab(TABS[next].id);
     tabRefs.current[next]?.focus();
-  }
-
-  const filtered = Boolean(competency || level || area);
-  function clearFilters() {
-    setCompetency("");
-    setLevel("");
-    setArea("");
   }
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 2xl:flex-row 2xl:items-center 2xl:justify-between">
-        <div
-          role="tablist"
-          aria-label="Practice type"
-          className="inline-flex max-w-full flex-none gap-1 self-start overflow-x-auto rounded-full border border-border bg-surface p-1 shadow-sm"
-        >
-          {TABS.map((t, i) => {
-            const active = tab === t.id;
-            return (
-              <button
-                key={t.id}
-                ref={(el) => {
-                  tabRefs.current[i] = el;
-                }}
-                id={`tab-${t.id}`}
-                role="tab"
-                type="button"
-                aria-selected={active}
-                aria-controls={`panel-${t.id}`}
-                tabIndex={active ? 0 : -1}
-                onClick={() => setTab(t.id)}
-                onKeyDown={(e) => onTabKey(e, i)}
-                className={`inline-flex h-9 flex-none cursor-pointer items-center gap-2 rounded-full border-0 px-4 text-sm whitespace-nowrap transition-colors ${
-                  active ? "bg-primary font-semibold text-on-primary shadow-sm" : "bg-transparent font-medium text-ink-2 hover:bg-hover hover:text-ink"
-                }`}
-              >
-                <t.Icon size={16} aria-hidden />
-                {t.label}
-                {t.id !== "rehearsal" && (
-                  <span
-                    className={`tabular inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold ${
-                      active ? "bg-on-primary/20 text-on-primary" : "bg-hover text-muted"
-                    }`}
-                  >
-                    {counts[t.id]}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-        {tab !== "rehearsal" && (
-          <div className="flex flex-wrap items-center gap-2">
-            <PillSelect id="filter-area" label="Practice area" active={Boolean(area)} value={area} onChange={(e) => setArea(e.target.value as PracticeArea | "")}>
-              <option value="">All practice areas</option>
-              {PRACTICE_AREAS.map((a) => (
-                <option key={a} value={a}>
-                  {PRACTICE_AREA_SHORT[a]}
-                </option>
-              ))}
-            </PillSelect>
-            <PillSelect
-              id="filter-competency"
-              label="Competency"
-              active={Boolean(competency)}
-              value={competency}
-              onChange={(e) => setCompetency(e.target.value as Competency | "")}
+      <p className="m-0 text-ink-2">Practise a client conversation or build a storyline, then get feedback scored at your target level.</p>
+
+      <div
+        role="tablist"
+        aria-label="Practice type"
+        className="inline-flex max-w-full flex-none gap-1 self-start overflow-x-auto rounded-full border border-border bg-surface p-1 shadow-sm"
+      >
+        {TABS.map((t, i) => {
+          const active = tab === t.id;
+          return (
+            <button
+              key={t.id}
+              ref={(el) => {
+                tabRefs.current[i] = el;
+              }}
+              id={`tab-${t.id}`}
+              role="tab"
+              type="button"
+              aria-selected={active}
+              aria-controls={`panel-${t.id}`}
+              tabIndex={active ? 0 : -1}
+              onClick={() => selectTab(t.id)}
+              onKeyDown={(e) => onTabKey(e, i)}
+              className={`inline-flex h-9 flex-none cursor-pointer items-center gap-2 rounded-full border-0 px-4 text-sm whitespace-nowrap transition-colors ${
+                active ? "bg-primary font-semibold text-on-primary shadow-sm" : "bg-transparent font-medium text-ink-2 hover:bg-hover hover:text-ink"
+              }`}
             >
-              <option value="">All competencies</option>
-              {COMPETENCIES.map((c) => (
-                <option key={c} value={c}>
-                  {COMPETENCY_LABELS[c]}
-                </option>
-              ))}
-            </PillSelect>
-            <PillSelect id="filter-level" label="Level" active={Boolean(level)} value={level} onChange={(e) => setLevel(e.target.value as Level | "")}>
-              <option value="">All levels</option>
-              {LEVELS.map((l) => (
-                <option key={l} value={l}>
-                  {LEVEL_LABELS[l]}
-                </option>
-              ))}
-            </PillSelect>
-            {filtered && (
-              <Button variant="ghost" size="md" onClick={clearFilters}>
-                <X size={16} aria-hidden />
-                Clear
-              </Button>
-            )}
-          </div>
-        )}
+              <t.Icon size={16} aria-hidden />
+              {t.label}
+            </button>
+          );
+        })}
       </div>
 
-      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
-        {tab === "rehearsal" ? (
-          <Card className="flex flex-col items-start gap-5 p-6 md:flex-row md:items-center md:p-8">
-            <IconChip Icon={Presentation} tone="success" />
-            <div className="flex min-w-0 flex-1 flex-col gap-1">
-              <CardTitle>Rehearse your SteerCo</CardTitle>
-              <p className="m-0 max-w-[620px] text-sm text-ink-2">
-                Rehearsal starts from a storyboard you&apos;ve submitted. Build or pick one in Storyboard Studio, then present it to an AI steering
-                committee that interrupts, challenges and asks for the so-what.
-              </p>
-            </div>
-            <ButtonLink href="/studio" size="lg">
-              Go to Storyboard Studio
-              <ArrowRight size={16} aria-hidden />
-            </ButtonLink>
-          </Card>
-        ) : visible.length === 0 ? (
-          <Card className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-            <IconChip Icon={SearchX} tone="neutral" />
-            <p className="m-0 text-sm text-muted">
-              {filtered ? "No scenarios match these filters." : "No scenarios here yet. New ones are on the way."}
+      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="flex flex-col gap-6">
+        {tab === "conversations" ? (
+          <>
+            <AreaFilter value={area} onChange={setArea} />
+            <p className="sr-only" aria-live="polite">
+              {conversations.length} {conversations.length === 1 ? "conversation" : "conversations"}
             </p>
-            {filtered && (
-              <Button variant="secondary" size="sm" onClick={clearFilters}>
-                Clear filters
-              </Button>
+            {conversations.length === 0 ? (
+              <Empty text={area ? "No conversations in this area yet." : "No conversations here yet."}>
+                {area && (
+                  <Button variant="secondary" size="sm" onClick={() => setArea(null)}>
+                    Show all areas
+                  </Button>
+                )}
+              </Empty>
+            ) : (
+              <CardGrid scenarios={conversations} onOpen={setDrawer} />
             )}
-          </Card>
+          </>
         ) : (
           <>
-            <p className="sr-only" aria-live="polite">
-              {visible.length} {visible.length === 1 ? "scenario" : "scenarios"}
-            </p>
-            <ul className="m-0 grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 xl:grid-cols-3">
-              {visible.map((s) => (
-                <li key={s.id} className="flex">
-                  <ScenarioCard scenario={s} onOpen={s.kind === "simulation" ? () => setDrawer(s.id) : undefined} />
-                </li>
-              ))}
-            </ul>
+            {cases.length === 0 ? <Empty text="No storyline cases yet." /> : <CardGrid scenarios={cases} onOpen={setDrawer} />}
+            {storyboards.length > 0 && <StorylineList storyboards={storyboards} />}
           </>
         )}
       </div>
 
       {open && <BriefingDrawer key={open.id} scenario={open} targetLevel={targetLevel} onClose={() => setDrawer(null)} />}
+    </div>
+  );
+}
+
+function CardGrid({ scenarios, onOpen }: { scenarios: HubScenario[]; onOpen: (id: string) => void }) {
+  return (
+    <ul className="m-0 grid list-none grid-cols-1 gap-5 p-0 md:grid-cols-2 xl:grid-cols-3">
+      {scenarios.map((s) => (
+        <li key={s.id} className="flex">
+          <ScenarioCard scenario={s} onOpen={s.kind === "simulation" ? () => onOpen(s.id) : undefined} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Empty({ text, children }: { text: string; children?: ReactNode }) {
+  return (
+    <Card className="flex flex-col items-center gap-3 px-6 py-14 text-center">
+      <SearchX size={24} className="text-muted" aria-hidden />
+      <p className="m-0 text-sm text-muted">{text}</p>
+      {children}
+    </Card>
+  );
+}
+
+/** Single-choice practice-area filter as a row of pill toggles. */
+function AreaFilter({ value, onChange }: { value: PracticeArea | null; onChange: (a: PracticeArea | null) => void }) {
+  const options: { id: PracticeArea | null; label: string }[] = [{ id: null, label: "All areas" }, ...PRACTICE_AREAS.map((a) => ({ id: a, label: PRACTICE_AREA_SHORT[a] }))];
+  return (
+    <div role="group" aria-label="Filter by practice area" className="flex flex-wrap gap-2">
+      {options.map((o) => {
+        const active = value === o.id;
+        return (
+          <button
+            key={o.id ?? "all"}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(o.id)}
+            className={`inline-flex h-8 cursor-pointer items-center rounded-full border px-3.5 text-[13px] whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-primary ${
+              active ? "border-primary/40 bg-primary-tint font-semibold text-primary" : "border-border bg-surface font-medium text-ink-2 hover:bg-hover hover:text-ink"
+            }`}
+          >
+            {o.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

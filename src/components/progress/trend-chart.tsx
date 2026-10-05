@@ -12,7 +12,7 @@ export interface TrendPoint {
 
 const WEEKS = 12;
 const DAY = 86_400_000;
-const H = 280;
+const H = 220;
 const M = { top: 16, right: 118, bottom: 30, left: 32 };
 
 /** 12-week competency trend: inline SVG, direct end labels, and a visually-hidden data table. */
@@ -75,8 +75,8 @@ export function TrendChart({ points, now }: { points: TrendPoint[]; now: string 
       >
         {[1, 2, 3, 4, 5].map((v) => (
           <g key={v}>
-            <line x1={M.left} x2={M.left + pw} y1={y(v)} y2={y(v)} stroke="var(--divider)" />
-            <text x={M.left - 8} y={y(v)} dy="0.32em" textAnchor="end" fontSize="11" fill="var(--muted)" className="tabular">
+            <line x1={M.left} x2={M.left + pw} y1={y(v)} y2={y(v)} stroke="var(--divider)" strokeOpacity="0.6" />
+            <text x={M.left - 8} y={y(v)} dy="0.32em" textAnchor="end" fontSize="11" fill="var(--faint)" className="tabular">
               {v}
             </text>
           </g>
@@ -88,15 +88,15 @@ export function TrendChart({ points, now }: { points: TrendPoint[]; now: string 
             y={H - 8}
             textAnchor={i === 0 ? "start" : i === weekTicks.length - 1 ? "end" : "middle"}
             fontSize="11"
-            fill="var(--muted)"
+            fill="var(--faint)"
             className={width < 480 && i % 2 ? "hidden" : ""}
           >
             {i === weekTicks.length - 1 ? "Now" : fmt(t)}
           </text>
         ))}
         {/* Bar */}
-        <line x1={M.left} x2={M.left + pw} y1={y(LEVEL_BAR)} y2={y(LEVEL_BAR)} stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="4 3" />
-        <text x={M.left + 4} y={y(LEVEL_BAR) - 5} fontSize="11" fontWeight="600" fill="var(--accent-ink)">
+        <line x1={M.left} x2={M.left + pw} y1={y(LEVEL_BAR)} y2={y(LEVEL_BAR)} stroke="var(--accent)" strokeWidth="1" strokeDasharray="4 3" />
+        <text x={M.left + 4} y={y(LEVEL_BAR) - 5} fontSize="11" fontWeight="500" fill="var(--accent-ink)">
           Bar {LEVEL_BAR}
         </text>
 
@@ -107,9 +107,9 @@ export function TrendChart({ points, now }: { points: TrendPoint[]; now: string 
             .join(" ");
           return (
             <g key={c}>
-              <path d={path} fill="none" stroke={st.color} strokeWidth="2" strokeDasharray={st.dash} strokeLinejoin="round" />
+              <path d={path} fill="none" stroke={st.color} strokeWidth="1.5" strokeDasharray={st.dash} strokeLinejoin="round" strokeOpacity="0.85" />
               {pts.map((p, i) => (
-                <circle key={i} cx={x(p.t)} cy={y(p.s)} r="3" fill="var(--surface)" stroke={st.color} strokeWidth="1.5" />
+                <circle key={i} cx={x(p.t)} cy={y(p.s)} r="2" fill={st.color} />
               ))}
             </g>
           );
@@ -122,7 +122,7 @@ export function TrendChart({ points, now }: { points: TrendPoint[]; now: string 
               {Math.abs(l.y - last) > 2 && (
                 <line x1={M.left + pw + 2} x2={M.left + pw + 8} y1={last} y2={l.y} stroke={SERIES[l.c].color} />
               )}
-              <text x={M.left + pw + 10} y={l.y} dy="0.32em" fontSize="12" fontWeight="600" fill={SERIES[l.c].color}>
+              <text x={M.left + pw + 10} y={l.y} dy="0.32em" fontSize="11" fontWeight="500" fill={SERIES[l.c].color}>
                 {SERIES[l.c].short} <tspan className="tabular" fill="var(--ink-2)">{l.score.toFixed(1)}</tspan>
               </text>
             </g>

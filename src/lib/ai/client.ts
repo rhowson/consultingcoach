@@ -21,6 +21,19 @@ export class AiUnavailableError extends Error {
 }
 
 /**
+ * Classify a Claude API failure so users get an honest message.
+ * "config" problems (bad key, no credit) need an administrator; "transient" ones are worth retrying.
+ */
+export function describeAiError(err: unknown): { kind: "config" | "transient"; message: string } {
+  if (err instanceof AiUnavailableError) return { kind: "config", message: "The AI coach isn't configured yet. An administrator needs to add the Claude API key." };
+  if (err instanceof Anthropic.AuthenticationError || err instanceof Anthropic.PermissionDeniedError)
+    return { kind: "config", message: "The AI coach's API key isn't valid. An administrator needs to check it." };
+  if (err instanceof Anthropic.APIError && /credit balance|billing/i.test(err.message))
+    return { kind: "config", message: "The AI coach is unavailable: the Claude API account has run out of credit. An administrator needs to top it up." };
+  return { kind: "transient", message: "The AI coach is busy right now. Please try again in a moment." };
+}
+
+/**
  * Every request opts into server-side refusal fallbacks: if the model's safety
  * classifiers decline a request, the API re-runs it on Anthropic's recommended
  * fallback model inside the same call.

@@ -5,7 +5,7 @@ import { LEVELS, verdictFor, type Level } from "@/lib/competency";
 import type { User } from "@/lib/auth";
 import { HttpError, badRequest, isUuid, notFound } from "@/lib/api/http";
 import * as engine from "@/lib/ai/engine";
-import { AiUnavailableError } from "@/lib/ai/client";
+import { AiUnavailableError, describeAiError } from "@/lib/ai/client";
 import { aiMode, scoringModel } from "@/lib/env";
 import type { PersonaContext, ScenarioContext } from "@/lib/ai/prompts";
 import type { CriterionScore, Mood, TranscriptTurn } from "@/lib/types";
@@ -166,7 +166,8 @@ export async function prepareMessage(user: User, attemptId: string, content: str
       await db
         .delete(schema.attemptMessages)
         .where(and(eq(schema.attemptMessages.attemptId, attemptId), eq(schema.attemptMessages.turn, turn)));
-      yield { type: "error", message: "The client couldn't respond. Please try sending again." };
+      const { kind, message } = describeAiError(err);
+      yield { type: "error", message: kind === "config" ? message : "The client couldn't respond. Please try sending again." };
       return;
     }
 

@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { ZodError, type ZodType } from "zod";
 import { getCurrentUser, type User } from "@/lib/auth";
-import { AiRefusalError, AiUnavailableError } from "@/lib/ai/client";
+import { AiRefusalError, AiUnavailableError, describeAiError } from "@/lib/ai/client";
 import { isAssessorEmail } from "@/lib/env";
 
 export class HttpError extends Error {
@@ -78,17 +78,12 @@ export function route<C = unknown>(handler: Handler<C>): Handler<C> {
         );
       }
       if (err instanceof Anthropic.APIError) {
-        // Auth/permission problems are configuration errors (bad or missing key); everything else is transient.
+        // Auth, permission and billing problems are configuration errors; everything else is transient.
         console.error(`Claude API error ${err.status}:`, err.message);
-        const config = err instanceof Anthropic.AuthenticationError || err instanceof Anthropic.PermissionDeniedError;
+        const { kind, message } = describeAiError(err);
         return NextResponse.json(
-          {
-            error: {
-              code: config ? "ai_misconfigured" : "ai_unavailable",
-              message: config ? "The AI coach isn't configured correctly." : "The AI coach is busy right now — please try again in a moment.",
-            },
-          },
-          { status: config ? 503 : 502 },
+          { error: { code: kind === "config" ? "ai_misconfigured" : "ai_unavailable", message } },
+          { status: kind === "config" ? 503 : 502 },
         );
       }
       console.error(err);
